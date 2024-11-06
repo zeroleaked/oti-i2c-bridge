@@ -1,7 +1,8 @@
 `ifndef AXIL_TB_TOP
 `define AXIL_TB_TOP
 
-`include "interfaces.sv"
+`include "../common/i2c_interface.sv"
+`include "axil_interface.sv"
 `include "dut_params_defines.svh"
 
 module axil_tb_top;
