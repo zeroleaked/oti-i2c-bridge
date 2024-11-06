@@ -7,7 +7,7 @@
 
 module axil_tb_top;
 	import uvm_pkg::*;
-    import dut_params_pkg::*;
+    // import dut_params_pkg::*;
 	import axil_test_pkg::*;
 	// import bridge_env_pkg::*;
     
