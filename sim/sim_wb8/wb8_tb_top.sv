@@ -1,9 +1,9 @@
 `include "uvm_macros.svh"
-`include "packages.svh"
+`include "top_interface.sv"
 
-module wb_master_testbench;
+module wb8_tb_top;
   import uvm_pkg::*;
-  import packages::*;
+  import wb8_pkg::*;
   
   // Instantiate the interface
   top_interface top_interface_inst();
@@ -30,7 +30,7 @@ module wb_master_testbench;
   // Dump waves
   initial begin
     $dumpfile("dump.vcd");
-    $dumpvars(0, wb_master_testbench);
+    $dumpvars(0, wb8_tb_top);
   end
   
 endmodule
