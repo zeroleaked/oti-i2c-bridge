@@ -1,0 +1,23 @@
+`ifndef I2C_AGENT_PKG
+`define I2C_AGENT_PKG
+
+package i2c_agent_pkg;
+   
+   import uvm_pkg::*;
+   `include "uvm_macros.svh"
+
+   //////////////////////////////////////////////////////////
+   // importing packages : agent,ref model, register ...
+   /////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////
+   // include top env files 
+   /////////////////////////////////////////////////////////
+  `include "i2c_trans.sv"
+  `include "i2c_monitor.sv"
+  `include "i2c_responder.sv"
+
+endpackage
+
+`endif
+
+
