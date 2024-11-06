@@ -9,7 +9,6 @@ package axil_seq_list;
    //////////////////////////////////////////////////////////
    // importing packages : agent,ref model, register ...
    /////////////////////////////////////////////////////////
-	import dut_params_pkg::*;
 	import i2c_master_axil_pkg::*;
 	import bridge_env_pkg::*;
 	import axil_agent_pkg::axil_seq_item;

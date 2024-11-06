@@ -14,7 +14,7 @@ class config_seq extends uvm_sequence #(axil_seq_item);
         req = axil_seq_item::type_id::create("req");
         start_item(req);
         req.addr = PRESCALE_REG;
-        req.data = DEFAULT_PRESCALE;  // Now this will be recognized
+        req.data = 1;
         req.read = 0;
         req.strb = 4'hF;
         finish_item(req);

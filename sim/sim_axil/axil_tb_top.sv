@@ -1,6 +1,9 @@
 `ifndef AXIL_TB_TOP
 `define AXIL_TB_TOP
 
+`include "interfaces.sv"
+`include "dut_params_defines.svh"
+
 module axil_tb_top;
 	import uvm_pkg::*;
     import dut_params_pkg::*;
