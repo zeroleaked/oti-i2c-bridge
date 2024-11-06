@@ -1,7 +1,7 @@
-`ifndef BRIDGE_AGENT_PKG
-`define BRIDGE_AGENT_PKG
+`ifndef AXIL_AGENT_PKG
+`define AXIL_AGENT_PKG
 
-package bridge_agent_pkg;
+package axil_agent_pkg;
    
    import uvm_pkg::*;
    `include "uvm_macros.svh"
@@ -13,9 +13,9 @@ package bridge_agent_pkg;
    //////////////////////////////////////////////////////////
    // include top env files 
    /////////////////////////////////////////////////////////
-  `include "i2c_trans.sv"
-  `include "i2c_monitor.sv"
-  `include "i2c_responder.sv"
+  `include "axil_seq_item.sv"
+  `include "axil_driver.sv"
+  `include "axil_monitor.sv"
 
 endpackage
 

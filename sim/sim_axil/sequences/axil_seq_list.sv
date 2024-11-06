@@ -12,7 +12,7 @@ package axil_seq_list;
 	import dut_params_pkg::*;
 	import i2c_master_axil_pkg::*;
 	import bridge_env_pkg::*;
-	import bridge_agent_pkg::axil_seq_item;
+	import axil_agent_pkg::axil_seq_item;
    //////////////////////////////////////////////////////////
    // include top env files 
    /////////////////////////////////////////////////////////
