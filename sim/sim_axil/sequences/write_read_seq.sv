@@ -1,3 +1,6 @@
+`ifndef WRITE_READ_SEQ
+`define WRITE_READ_SEQ
+
 class write_read_seq extends uvm_sequence #(axil_seq_item);
     `uvm_object_utils(write_read_seq)
     
@@ -46,3 +49,5 @@ class write_read_seq extends uvm_sequence #(axil_seq_item);
 		`uvm_info("SEQ", $sformatf("Read data from I2C: %h", mem_slave.data), UVM_LOW)
     endtask
 endclass
+
+`endif

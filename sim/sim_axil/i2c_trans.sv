@@ -1,3 +1,6 @@
+`ifndef I2C_TRANS
+`define I2C_TRANS
+
 class i2c_trans extends uvm_sequence_item;
     rand bit [6:0] addr;
     rand bit       read;
@@ -19,3 +22,5 @@ class i2c_trans extends uvm_sequence_item;
         return $sformatf("addr=%h read=%b data=%h", addr, read, data);
     endfunction
 endclass
+
+`endif

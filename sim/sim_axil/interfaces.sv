@@ -1,7 +1,5 @@
-`ifndef TIMESCALE_SV
-`define TIMESCALE_SV
-`timescale 1ns/1ps
-`endif
+`ifndef INTERFACES
+`define INTERFACES
 interface i2c_if(input logic clk, rst);
     logic scl_i, scl_o, scl_t;
     logic sda_i, sda_o, sda_t;
@@ -61,3 +59,5 @@ interface axil_if(input logic clk, rst);
     modport driver(clocking driver_cb);
     modport monitor(clocking monitor_cb);
 endinterface
+
+`endif

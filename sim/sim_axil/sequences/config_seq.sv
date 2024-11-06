@@ -1,3 +1,6 @@
+`ifndef CONFIG_SEQ
+`define CONFIG_SEQ
+
 class config_seq extends uvm_sequence #(axil_seq_item);
     `uvm_object_utils(config_seq)
 
@@ -17,3 +20,5 @@ class config_seq extends uvm_sequence #(axil_seq_item);
         finish_item(req);
     endtask
 endclass
+
+`endif

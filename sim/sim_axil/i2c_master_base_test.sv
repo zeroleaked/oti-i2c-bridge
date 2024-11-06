@@ -1,3 +1,6 @@
+`ifndef I2C_MASTER_BASE_TEST
+`define I2C_MASTER_BASE_TEST
+
 class i2c_master_base_test extends uvm_test;
     bridge_env env;
     
@@ -32,3 +35,5 @@ class i2c_master_base_test extends uvm_test;
         phase.drop_objection(this);
     endtask
 endclass
+
+`endif

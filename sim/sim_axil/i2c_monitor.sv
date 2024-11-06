@@ -1,3 +1,6 @@
+`ifndef I2C_MONITOR
+`define I2C_MONITOR
+
 class i2c_monitor extends uvm_monitor;
     virtual i2c_if vif;
     uvm_analysis_port #(i2c_trans) ap;
@@ -112,3 +115,5 @@ class i2c_monitor extends uvm_monitor;
         end
     endtask
 endclass
+
+`endif

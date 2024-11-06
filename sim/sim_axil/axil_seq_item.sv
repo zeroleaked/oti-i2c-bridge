@@ -1,3 +1,6 @@
+`ifndef AXIL_SEQ_ITEM
+`define AXIL_SEQ_ITEM
+
 class axil_seq_item extends uvm_sequence_item;
     rand bit [3:0]  addr;
     rand bit [31:0] data;
@@ -19,3 +22,5 @@ class axil_seq_item extends uvm_sequence_item;
         addr inside {[0:3]};
     }
 endclass
+
+`endif

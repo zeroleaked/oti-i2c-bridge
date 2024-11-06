@@ -1,3 +1,6 @@
+`ifndef AXIL_TB_TOP
+`define AXIL_TB_TOP
+
 module axil_tb_top;
 	import uvm_pkg::*;
     import dut_params_pkg::*;
@@ -115,3 +118,5 @@ module axil_tb_top;
     end
 
 endmodule
+
+`endif

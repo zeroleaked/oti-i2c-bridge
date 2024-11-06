@@ -1,3 +1,6 @@
+`ifndef I2C_MASTER_TEST
+`define I2C_MASTER_TEST
+
 class i2c_master_test extends i2c_master_base_test;
     `uvm_component_utils(i2c_master_test)
     
@@ -28,3 +31,5 @@ class i2c_master_test extends i2c_master_base_test;
         phase.drop_objection(this);
     endtask
 endclass
+
+`endif

@@ -1,3 +1,6 @@
+`ifndef AXIL_DRIVER
+`define AXIL_DRIVER
+
 class axil_driver extends uvm_driver #(axil_seq_item);
     virtual axil_if vif;  // Make sure this matches your interface type
     
@@ -62,3 +65,5 @@ class axil_driver extends uvm_driver #(axil_seq_item);
         end
     endtask
 endclass
+
+`endif

@@ -1,3 +1,6 @@
+`ifndef MEMORY_SLAVE_SEQ
+`define MEMORY_SLAVE_SEQ
+
 class memory_slave_seq extends uvm_sequence #(axil_seq_item);
 	uvm_sequencer_base sequencer;
     bit is_write;
@@ -72,3 +75,5 @@ class memory_slave_seq extends uvm_sequence #(axil_seq_item);
 		this.data = rsp.data;
 	endtask
 endclass
+
+`endif

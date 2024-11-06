@@ -1,3 +1,6 @@
+`ifndef DUT_PARAMS_PKG
+`define DUT_PARAMS_PKG
+
 package dut_params_pkg;
     parameter DEFAULT_PRESCALE = 1;
     parameter FIXED_PRESCALE = 0;
@@ -8,3 +11,5 @@ package dut_params_pkg;
     parameter READ_FIFO = 1;
     parameter READ_FIFO_DEPTH = 32;
 endpackage
+
+`endif

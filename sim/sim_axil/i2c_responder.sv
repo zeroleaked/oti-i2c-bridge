@@ -1,3 +1,6 @@
+`ifndef I2C_RESPONDER
+`define I2C_RESPONDER
+
 class i2c_responder extends uvm_component;
     virtual i2c_if vif;
     bit [7:0] memory[bit [7:0]]; // Simple memory model
@@ -121,3 +124,5 @@ class i2c_responder extends uvm_component;
         return memory[addr];
     endfunction
 endclass
+
+`endif

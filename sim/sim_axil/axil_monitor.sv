@@ -1,3 +1,6 @@
+`ifndef AXIL_MONITOR
+`define AXIL_MONITOR
+
 class axil_monitor extends uvm_monitor;
     virtual axil_if vif;
     uvm_analysis_port #(axil_seq_item) ap;
@@ -61,3 +64,5 @@ class axil_monitor extends uvm_monitor;
         disable fork;
     endtask
 endclass
+
+`endif
