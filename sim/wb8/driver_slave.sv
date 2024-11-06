@@ -175,7 +175,7 @@ class wb_master_driver_slave extends uvm_driver#(sequence_item_slave);
             stop = 0;                              // stop bit variable
             ack = 0;                               // ack/nack variable
             data = 0;                              // data packet (8 bits)
-            packet = 0;                            // ack/nack variable (redundant, remove later)
+            packet = PACKET_ACK;                            // ack/nack variable (redundant, remove later)
             flip = (resp_state == RESP_READ);      // master/slave operation based on the state
             top_vinterface.resp_sda_o = 1 ^ flip;
 
