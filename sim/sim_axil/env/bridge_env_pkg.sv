@@ -10,7 +10,7 @@ package bridge_env_pkg;
    // importing packages : agent,ref model, register ...
    /////////////////////////////////////////////////////////
 	import i2c_master_axil_pkg::*;
-	import bridge_agent_pkg::*;
+	import i2c_agent_pkg::*;
 	import axil_agent_pkg::*;
    //////////////////////////////////////////////////////////
    // include top env files 

@@ -1,7 +1,7 @@
-`ifndef BRIDGE_AGENT_PKG
-`define BRIDGE_AGENT_PKG
+`ifndef I2C_AGENT_PKG
+`define I2C_AGENT_PKG
 
-package bridge_agent_pkg;
+package i2c_agent_pkg;
    
    import uvm_pkg::*;
    `include "uvm_macros.svh"
