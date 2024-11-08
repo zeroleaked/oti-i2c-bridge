@@ -51,7 +51,7 @@ package axil_seq_list;
 	`include "write_read_seq.sv"
 
 	`include "axil_i2c_api_base_seq.sv"
-	`include "axil_i2c_single_w_seq.sv"
+	`include "axil_i2c_response_seq.sv"
 
 	`include "axil_basic_vseq.sv"
 

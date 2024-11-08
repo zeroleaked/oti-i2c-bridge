@@ -18,7 +18,7 @@ class axil_basic_vseq extends uvm_sequence;
 		
 		memory_slave_seq mem_slave = memory_slave_seq::type_id::create("req");
 		api_single_rw_seq axil_api = api_single_rw_seq::type_id::create("req");
-		i2c_single_w_seq i2c_w_api = i2c_single_w_seq::type_id::create("req");
+		i2c_response_seq i2c_w_api = i2c_response_seq::type_id::create("req");
 
 		int timeout_count = 0;
 

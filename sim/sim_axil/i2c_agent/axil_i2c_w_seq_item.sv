@@ -11,7 +11,6 @@ class i2c_w_seq_item extends i2c_seq_item;
     }
     
     constraint write_data_size {
-        // data.trans_type == WRITE_TRANSACTION; 
 		data.size() == 0;  // Initial data is empty for write
     }
 
