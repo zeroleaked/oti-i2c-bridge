@@ -42,7 +42,7 @@ class axil_basic_vseq extends uvm_sequence;
 		axil_i2c_write.slave_address = slave_addr;
 		axil_i2c_read.slave_address = slave_addr;
 
-		// starting AXIL to I2C write sequence
+		// AXIL to I2C write sequence
 		axil_i2c_write.data_length = data_length;
 		i2c_api.req.cfg_data_length = 0; // no respond data for write
 		fork
@@ -50,7 +50,7 @@ class axil_basic_vseq extends uvm_sequence;
 			i2c_api.start(i2c_sequencer);
 		join
 
-		// starting AXIL to I2C read sequence
+		// AXIL to I2C read sequence
 		axil_i2c_read.data_length = data_length;
 		i2c_api.req.cfg_data_length = data_length;
 		fork
