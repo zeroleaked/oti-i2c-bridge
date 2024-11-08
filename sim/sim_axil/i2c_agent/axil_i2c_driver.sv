@@ -36,7 +36,8 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 		`uvm_info(get_type_name(), "good morning", UVM_LOW)
 		forever begin
 			@(vif.driver_cb)
-			fork
+			// isolate the second fork as a single child process
+			fork begin fork
 				// Detect START condition (SDA falling while SCL high)
 				begin
 					@(negedge vif.sda_i);
@@ -57,21 +58,18 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 				end
 				// Normal bit transfer
 				begin
-					@(negedge vif.scl_i);
+					wait(!vif.scl_i);
 					`uvm_info(get_type_name(), "lets handle transfer", UVM_LOW)
 					// Sample on falling edge of SCL
 					handle_transfer();
 				end
-			join_any
-			disable fork;
+			join_any disable fork; end join
 		end
 	endtask
 
 	// Handle START condition
 	protected task handle_start();
-		`uvm_info(get_type_name(), "handle_start", UVM_LOW)
 		bit_count = 0;
-		`uvm_info(get_type_name(), "getting item...", UVM_LOW)
 		seq_item_port.get_next_item(current_item);
 		`uvm_info(get_type_name(), "driver rx", UVM_LOW)
 		current_item.print();
@@ -119,14 +117,15 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 		// Data phase
 		else begin
 			if (is_read_transaction) begin
+				`uvm_info(get_type_name(), "handle read transaction", UVM_LOW)
 				// Master is reading, we need to drive data
-				if (bit_count % 9 == 0) begin
-					bit master_ack;
+				if (bit_count % 9 == 7) begin
+					`uvm_info(get_type_name(), "one byte sent", UVM_LOW)
 					// Check master ACK/NACK
 					@(posedge vif.scl_i);
-					master_ack = !vif.sda_i;
 					
-					if (!master_ack) begin
+					if (vif.sda_i) begin
+						`uvm_info(get_type_name(), "master nacked, end of transfer", UVM_LOW)
 						// Master NACKed, end of transfer
 						vif.sda_o <= 1;
 						return;
@@ -135,12 +134,13 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 				end
 				else begin
 					// Drive data bit
-					int data_index = bit_count / 9;
-					int bit_index = 7 - ((bit_count - 1) % 8);
+					int data_index = bit_count / 8 - 1;
+					int bit_index = 7 - (bit_count % 8);
 					
 					if (data_index < current_item.data.size()) begin
-						@(posedge vif.scl_i);
 						vif.sda_o <= current_item.data[data_index][bit_index];
+						wait(vif.scl_i);
+						`uvm_info(get_type_name(), $sformatf("drive[%d][%d] %h", data_index, bit_index, current_item.data[data_index][bit_index]), UVM_LOW)
 						
 						bit_count++;
 					end
@@ -151,16 +151,13 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 				// Master is writing, we need to receive data
 
 				// if one byte done, send ack
-				if ((bit_count % 8 == 7) & (bit_count != 8)) begin
+				if (bit_count % 9 == 7) begin
 					`uvm_info(get_type_name(), "one byte done, sending ack", UVM_LOW)
 					// Generate ACK
 					vif.sda_o <= 0;
-					@(negedge vif.scl_i);
-					vif.sda_o <= 1;
 				end
-				else begin
-					vif.sda_o <= 1;  // Release SDA for master
-				end
+				@(negedge vif.scl_i);
+				vif.sda_o <= 1;
 				bit_count++;
 			end
 		end
