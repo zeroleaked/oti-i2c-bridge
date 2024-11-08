@@ -22,7 +22,14 @@ class axil_basic_test extends uvm_test;
 
         basic_vseq = axil_basic_vseq::type_id::create("axil_basic_vseq");
         basic_vseq.configure(env.axil_seqr, env.i2c_seqr);
-        basic_vseq.start(null);
+
+		// single read/write
+		basic_vseq.single_op_mode = 1;
+        repeat (10) basic_vseq.start(null);
+
+		// multiple read/write
+		basic_vseq.single_op_mode = 0;
+        repeat (10) basic_vseq.start(null);
         
         // TODO: Add more sophisticated test scenarios
         #1000;

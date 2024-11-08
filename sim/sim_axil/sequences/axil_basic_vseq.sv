@@ -4,12 +4,18 @@
 class axil_basic_vseq extends uvm_sequence;
 	uvm_sequencer_base axil_sequencer;
 	uvm_sequencer_base i2c_sequencer;
+
+	bit single_op_mode = 0;
     
 	rand bit [6:0] slave_addr;
 	rand int data_length;
-	
-	constraint len_c {
-		data_length inside {[1:10]};
+
+	constraint cfg_c {
+		if (single_op_mode) {
+			data_length == 1;
+		} else {
+			data_length inside {[1:10]};
+		}
 	}
 
 	`uvm_object_utils_begin(axil_basic_vseq)
@@ -30,6 +36,8 @@ class axil_basic_vseq extends uvm_sequence;
 		assert (this.randomize())
 		else `uvm_error(get_type_name(), "Randomization failed");
 
+        `uvm_info(get_type_name(), $sformatf("slave_addr=%0h data_length=%0d", slave_addr, data_length), UVM_LOW)
+
 		i2c_api.req.cfg_address = slave_addr;
 		axil_i2c_write.slave_address = slave_addr;
 		axil_i2c_read.slave_address = slave_addr;
@@ -38,13 +46,13 @@ class axil_basic_vseq extends uvm_sequence;
 
 		axil_i2c_write.data_length = data_length;
 		i2c_api.req.cfg_data_length = 0; // no respond data for write
-
 		fork
 			axil_i2c_write.start(axil_sequencer);
 			i2c_api.start(i2c_sequencer);
 		join
 		        
         `uvm_info(get_type_name(), "Starting AXIL to I2C read sequence", UVM_MEDIUM)
+
 		axil_i2c_read.data_length = data_length;
 		i2c_api.req.cfg_data_length = data_length;
 		fork
