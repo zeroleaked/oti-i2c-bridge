@@ -5,20 +5,30 @@ class axil_basic_vseq extends uvm_sequence;
 	uvm_sequencer_base axil_sequencer;
 	uvm_sequencer_base i2c_sequencer;
     
-	`uvm_object_utils(axil_basic_vseq)
+	rand bit [6:0] slave_addr;
+	rand int data_length;
+	
+	constraint len_c {
+		data_length inside {[1:10]};
+	}
+
+	`uvm_object_utils_begin(axil_basic_vseq)
+		`uvm_field_int(slave_addr, UVM_DEFAULT)
+		`uvm_field_int(data_length, UVM_DEFAULT)
+	`uvm_object_utils_end
     
     function new(string name = "axil_basic_vseq");
         super.new(name);
     endfunction
 
     task body();
-        bit [6:0] slave_addr = 7'h50;  // TODO: Make this configurable
-		int data_length = 3;
-		
 		axil_i2c_op_write_seq axil_i2c_write = axil_i2c_op_write_seq::type_id::create("req");
 		axil_i2c_slave_resp_seq i2c_api = axil_i2c_slave_resp_seq::type_id::create("req");
 
 		axil_i2c_op_read_seq axil_i2c_read = axil_i2c_op_read_seq::type_id::create("req");
+
+		assert (this.randomize())
+		else `uvm_error(get_type_name(), "Randomization failed");
 
 		i2c_api.req.cfg_address = slave_addr;
 		axil_i2c_write.slave_address = slave_addr;
