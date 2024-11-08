@@ -7,6 +7,8 @@ class i2c_seq_item extends uvm_sequence_item;
     rand bit [7:0] data[];      // Array of data bytes for read/write
     rand bit is_write;
 
+	bit [6:0] cfg_address;
+
     // Constraints
     constraint valid_addr_c {
         address inside {[0:7'h7F]};  // 7-bit address range
@@ -14,6 +16,14 @@ class i2c_seq_item extends uvm_sequence_item;
     
     constraint reasonable_data_size_c {
         data.size() inside {[0:32]};  // Reasonable data array size
+    }
+
+    constraint seq_cfg_address_c {
+        address == cfg_address;  // 7-bit address range
+    }
+    
+    constraint data_empty_c {
+		data.size() == 0;  // Initial data is empty for write
     }
 
     // UVM automation macros
