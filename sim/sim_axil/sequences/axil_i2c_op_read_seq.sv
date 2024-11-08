@@ -1,18 +1,18 @@
-`ifndef AXIL_I2C_READ_SEQ
-`define AXIL_I2C_READ_SEQ
+`ifndef AXIL_I2C_OP_READ_SEQ
+`define AXIL_I2C_OP_READ_SEQ
 
-class axil_i2c_read_seq extends uvm_sequence #(axil_seq_item);
-    `uvm_object_utils(axil_i2c_read_seq)
+class axil_i2c_op_read_seq extends uvm_sequence #(axil_seq_item);
+    `uvm_object_utils(axil_i2c_op_read_seq)
 	int data_length;
 	bit [6:0] slave_address;
 
-    function new(string name = "axil_i2c_read_seq");
+    function new(string name = "axil_i2c_op_read_seq");
         super.new(name);
     endfunction
   
 	task body();
-		axil_write_seq write_api = axil_write_seq::type_id::create("write_api");
-		axil_read_seq read_api = axil_read_seq::type_id::create("write_api");
+		axil_bus_write_seq write_api = axil_bus_write_seq::type_id::create("write_api");
+		axil_bus_read_seq read_api = axil_bus_read_seq::type_id::create("write_api");
 
 		// address phase and first byte
 		write_api.req.cfg_address = CMD_REG;

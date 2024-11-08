@@ -52,12 +52,12 @@ package axil_seq_list;
 
 	// APIs
 	`include "axil_i2c_response_seq.sv"
-	`include "axil_write_seq.sv"
-	`include "axil_read_seq.sv"
+	`include "axil_bus_write_seq.sv"
+	`include "axil_bus_read_seq.sv"
 
 	// AXI-Lite workers
-	`include "axil_i2c_write_seq.sv"
-	`include "axil_i2c_read_seq.sv"
+	`include "axil_i2c_op_write_seq.sv"
+	`include "axil_i2c_op_read_seq.sv"
 
 	`include "axil_basic_vseq.sv"
 

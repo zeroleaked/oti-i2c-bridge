@@ -1,17 +1,17 @@
-`ifndef AXIL_I2C_WRITE_SEQ
-`define AXIL_I2C_WRITE_SEQ
+`ifndef AXIL_I2C_OP_WRITE_SEQ
+`define AXIL_I2C_OP_WRITE_SEQ
 
-class axil_i2c_write_seq extends uvm_sequence #(axil_seq_item);
-    `uvm_object_utils(axil_i2c_write_seq)
+class axil_i2c_op_write_seq extends uvm_sequence #(axil_seq_item);
+    `uvm_object_utils(axil_i2c_op_write_seq)
 	int data_length;
 	bit [6:0] slave_address;
 
-    function new(string name = "axil_i2c_write_seq");
+    function new(string name = "axil_i2c_op_write_seq");
         super.new(name);
     endfunction
   
 	task body();
-		axil_write_seq api = axil_write_seq::type_id::create("api");
+		axil_bus_write_seq api = axil_bus_write_seq::type_id::create("api");
 
 		// address phase
 		api.req.cfg_address = CMD_REG;
