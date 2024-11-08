@@ -33,7 +33,6 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 		vif.driver_cb.scl_o <= 1;  // Always high
 		vif.driver_cb.sda_o <= 1;
 		
-		`uvm_info(get_type_name(), "good morning", UVM_LOW)
 		forever begin
 			@(vif.driver_cb)
 			// isolate the second fork as a single child process
@@ -42,7 +41,7 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 				begin
 					@(negedge vif.sda_i);
 					if (vif.scl_i) begin
-						`uvm_info(get_type_name(), "start detected", UVM_LOW)
+						`uvm_info(get_type_name(), "start detected", UVM_HIGH)
 						handle_start();
 					end
 					else wait(0); // forever
@@ -51,7 +50,7 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 				begin
 					@(posedge vif.sda_i)
 					if (vif.scl_i) begin
-						`uvm_info(get_type_name(), "stop detected", UVM_LOW)
+						`uvm_info(get_type_name(), "stop detected", UVM_HIGH)
 						handle_stop();
 					end
 					else wait(0); // forever
@@ -59,7 +58,7 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 				// Normal bit transfer
 				begin
 					wait(!vif.scl_i);
-					`uvm_info(get_type_name(), "lets handle transfer", UVM_LOW)
+					`uvm_info(get_type_name(), "lets handle transfer", UVM_HIGH)
 					// Sample on falling edge of SCL
 					handle_transfer();
 				end
@@ -70,9 +69,8 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 	// Handle START condition
 	protected task handle_start();
 		bit_count = 0;
-		seq_item_port.get_next_item(current_item);
-		`uvm_info(get_type_name(), "driver rx", UVM_LOW)
-		current_item.print();
+		if (current_item == null)
+			seq_item_port.get_next_item(current_item);
 	endtask
 
 	// Handle STOP condition
@@ -87,14 +85,14 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 
 	// Handle data transfer
 	protected task handle_transfer();
-		`uvm_info(get_type_name(), $sformatf("bit_count = %d", bit_count), UVM_LOW)
+		`uvm_info(get_type_name(), $sformatf("bit_count = %d", bit_count), UVM_HIGH)
 
 		// Address reception (first byte after START)
 		if (bit_count < 8) begin
 			wait(vif.scl_i);
 			// Sample address bit
 			received_address[7-bit_count] = vif.sda_i;
-			`uvm_info(get_type_name(), $sformatf("ADDRESS BIT[%d] %h", 7-bit_count, received_address[7-bit_count]), UVM_LOW)
+			`uvm_info(get_type_name(), $sformatf("address [%d] %h", 7-bit_count, received_address[7-bit_count]), UVM_HIGH)
 			bit_count++;
 			
 			// Complete address reception
@@ -110,24 +108,24 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 						vif.sda_o <= 0;
 						@(negedge vif.scl_i);
 						vif.sda_o <= 1;
-						`uvm_info(get_type_name(), "complete address reception", UVM_LOW)
+						`uvm_info(get_type_name(), "complete address reception", UVM_HIGH)
 					end
 			end
 		end
 		// Data phase
 		else begin
 			if (is_read_transaction) begin
-				`uvm_info(get_type_name(), "handle read transaction", UVM_LOW)
+				`uvm_info(get_type_name(), "handle read transaction", UVM_HIGH)
 				// Master is reading, we need to drive data
 				if (bit_count % 9 == 7) begin
-					`uvm_info(get_type_name(), "one byte sent", UVM_LOW)
+					`uvm_info(get_type_name(), "one byte sent", UVM_HIGH)
 					// release sda for ack
 					vif.sda_o <= 1;
 					// Check master ACK/NACK
 					@(posedge vif.scl_i);
 					
 					if (vif.sda_i) begin
-						`uvm_info(get_type_name(), "master nacked, end of transfer", UVM_LOW)
+						`uvm_info(get_type_name(), "master nacked, end of transfer", UVM_HIGH)
 						// Master NACKed, end of transfer
 						return;
 					end
@@ -141,19 +139,19 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 					if (data_index < current_item.data.size()) begin
 						vif.sda_o <= current_item.data[data_index][bit_index];
 						wait(vif.scl_i);
-						`uvm_info(get_type_name(), $sformatf("drive[%d][%d] %h", data_index, bit_index, current_item.data[data_index][bit_index]), UVM_LOW)
+						`uvm_info(get_type_name(), $sformatf("drive data[%d][%d] %h", data_index, bit_index, current_item.data[data_index][bit_index]), UVM_HIGH)
 						
 						bit_count++;
 					end
 				end
 			end
 			else begin
-				`uvm_info(get_type_name(), "handle write transaction", UVM_LOW)
+				`uvm_info(get_type_name(), "handle write transaction", UVM_HIGH)
 				// Master is writing, we need to receive data
 
 				// if one byte done, send ack
 				if (bit_count % 9 == 7) begin
-					`uvm_info(get_type_name(), "one byte done, sending ack", UVM_LOW)
+					`uvm_info(get_type_name(), "one byte done, sending ack", UVM_HIGH)
 					// Generate ACK
 					vif.sda_o <= 0;
 				end
