@@ -37,6 +37,7 @@ package i2c_agent_pkg;
 
   `include "axil_i2c_seq_item.sv"
   `include "axil_i2c_driver.sv"
+  `include "axil_i2c_monitor.sv"
 
   // TODO: Consider adding i2c_config.sv for agent configuration
   // TODO: Add i2c_seq_lib.sv for common I2C sequences

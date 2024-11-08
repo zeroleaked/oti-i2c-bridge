@@ -21,6 +21,7 @@
 
 class bridge_env extends uvm_env;
     axil_driver    axil_drv;
+	axil_i2c_monitor i2c_mon_new;
     axil_monitor   axil_mon;
     i2c_monitor    i2c_mon;
     uvm_sequencer #(axil_seq_item) axil_seqr;
@@ -28,7 +29,7 @@ class bridge_env extends uvm_env;
     axil_coverage cov;
 
     uvm_sequencer #(i2c_seq_item) i2c_seqr;
-	i2c_driver i2c_drv;
+	axil_i2c_driver i2c_drv;
 
     `uvm_component_utils(bridge_env)
     
@@ -50,7 +51,8 @@ class bridge_env extends uvm_env;
         scbd = scoreboard::type_id::create("scbd", this);
         cov = axil_coverage::type_id::create("cov", this);
 
-        i2c_drv = i2c_driver::type_id::create("i2c_drv", this);  
+        i2c_drv = axil_i2c_driver::type_id::create("i2c_drv", this);  
+        i2c_mon_new = axil_i2c_monitor::type_id::create("i2c_mon_new", this);  
     endfunction
     
     // Connect phase: Establish connections between components

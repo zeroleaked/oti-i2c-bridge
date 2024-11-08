@@ -36,7 +36,7 @@ class axil_basic_vseq extends uvm_sequence;
 		assert (this.randomize())
 		else `uvm_error(get_type_name(), "Randomization failed");
 
-        `uvm_info(get_type_name(), $sformatf("slave_addr=%0h data_length=%0d", slave_addr, data_length), UVM_LOW)
+        `uvm_info(get_type_name(), $sformatf("write then read: slave_addr=%0h data_length=%0d", slave_addr, data_length), UVM_LOW)
 
 		i2c_api.req.cfg_address = slave_addr;
 		axil_i2c_write.slave_address = slave_addr;
