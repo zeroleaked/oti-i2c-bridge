@@ -121,21 +121,22 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 				// Master is reading, we need to drive data
 				if (bit_count % 9 == 7) begin
 					`uvm_info(get_type_name(), "one byte sent", UVM_LOW)
+					// release sda for ack
+					vif.sda_o <= 1;
 					// Check master ACK/NACK
 					@(posedge vif.scl_i);
 					
 					if (vif.sda_i) begin
 						`uvm_info(get_type_name(), "master nacked, end of transfer", UVM_LOW)
 						// Master NACKed, end of transfer
-						vif.sda_o <= 1;
 						return;
 					end
 					bit_count++;
 				end
 				else begin
 					// Drive data bit
-					int data_index = bit_count / 8 - 1;
-					int bit_index = 7 - (bit_count % 8);
+					int data_index = (bit_count+1) / 9 - 1;
+					int bit_index = 7 - ((bit_count+1) % 9);
 					
 					if (data_index < current_item.data.size()) begin
 						vif.sda_o <= current_item.data[data_index][bit_index];
