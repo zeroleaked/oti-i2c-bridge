@@ -12,9 +12,7 @@ class axil_basic_vseq extends uvm_sequence;
     endfunction
 
     task body();
-        axil_seq_item req;
         bit [6:0] slave_addr = 7'h50;  // TODO: Make this configurable
-        bit [7:0] reg_addr = 8'hC5;     // TODO: Make this configurable
 		int data_length = 3;
 		
 		axil_i2c_write_seq axil_i2c_write = axil_i2c_write_seq::type_id::create("req");
@@ -26,17 +24,17 @@ class axil_basic_vseq extends uvm_sequence;
 		axil_i2c_write.slave_address = slave_addr;
 		axil_i2c_read.slave_address = slave_addr;
 
-        // `uvm_info(get_type_name(), "Starting I2C write sequence", UVM_MEDIUM)
+        `uvm_info(get_type_name(), "Starting AXIL to I2C write sequence", UVM_MEDIUM)
 
-		// axil_i2c_write.data_length = data_length;
-		// i2c_api.req.cfg_data_length = 0; // no respond data for write
+		axil_i2c_write.data_length = data_length;
+		i2c_api.req.cfg_data_length = 0; // no respond data for write
 
-		// fork
-		// 	axil_i2c_write.start(axil_sequencer);
-		// 	i2c_api.start(i2c_sequencer);
-		// join
+		fork
+			axil_i2c_write.start(axil_sequencer);
+			i2c_api.start(i2c_sequencer);
+		join
 		        
-        `uvm_info(get_type_name(), "Starting I2C read sequence", UVM_MEDIUM)
+        `uvm_info(get_type_name(), "Starting AXIL to I2C read sequence", UVM_MEDIUM)
 		axil_i2c_read.data_length = data_length;
 		i2c_api.req.cfg_data_length = data_length;
 		fork
