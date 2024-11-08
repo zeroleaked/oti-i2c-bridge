@@ -38,6 +38,7 @@ package axil_seq_list;
 	import i2c_master_axil_pkg::*;
 	import bridge_env_pkg::*;
 	import axil_agent_pkg::axil_seq_item;
+	import i2c_agent_pkg::*;
    //////////////////////////////////////////////////////////
    // include top env files 
    /////////////////////////////////////////////////////////
@@ -48,6 +49,11 @@ package axil_seq_list;
 
 	`include "config_seq.sv"
 	`include "write_read_seq.sv"
+
+	`include "axil_i2c_base_seq.sv"
+	`include "axil_i2c_single_w_seq.sv"
+
+	`include "axil_basic_vseq.sv"
 
    // TODO: Add factory registration for all sequences if not done in individual files
 endpackage

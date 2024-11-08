@@ -35,6 +35,8 @@ package axil_test_pkg;
   `include "i2c_master_base_test.sv"
   `include "i2c_master_test.sv"
 
+  `include "axil_basic_test.sv"
+
    // Note: Add new test case includes here as they are developed
 endpackage
 

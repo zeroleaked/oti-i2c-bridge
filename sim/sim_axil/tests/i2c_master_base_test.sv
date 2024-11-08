@@ -29,15 +29,6 @@ class i2c_master_base_test extends uvm_test;
         super.build_phase(phase);
         env = bridge_env::type_id::create("env", this);
     endfunction
-    
-    function void end_of_elaboration_phase(uvm_phase phase);
-        super.end_of_elaboration_phase(phase);
-        
-        // TODO: Consider moving this to a separate configuration class
-        // responder initial values
-        env.i2c_resp.set_memory(7'h50, 8'hAA);  // example: set address 0x50 to value 0xaa
-        env.i2c_resp.my_address = 7'h50;        // set responder's i2c address
-    endfunction
 
     task run_phase(uvm_phase phase);
         config_seq config_seq_i;

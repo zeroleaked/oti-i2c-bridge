@@ -28,9 +28,9 @@ class i2c_master_test extends i2c_master_base_test;
         
         phase.raise_objection(this);
         
-        config_seq_i = config_seq::type_id::create("config_seq");
-        `uvm_info("TEST", "Starting config sequence", UVM_LOW)
-        config_seq_i.start(env.axil_seqr);
+        // config_seq_i = config_seq::type_id::create("config_seq");
+        // `uvm_info("TEST", "Starting config sequence", UVM_LOW)
+        // config_seq_i.start(env.axil_seqr);
         
         #1000;
         // TODO: Replace this check with a more robust mechanism

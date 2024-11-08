@@ -50,15 +50,15 @@ class memory_slave_seq extends uvm_sequence #(axil_seq_item);
       // TODO: Implement proper error handling for timeouts
 			api_rw_seq.write_register_command(slave_address, CMD_START | CMD_WRITE | CMD_STOP);
 			api_rw_seq.write_register_data(register_address, DATA_LAST); // register 0
-			api_rw_seq.write_register_command(slave_address, CMD_START | CMD_READ | CMD_STOP);
+			// api_rw_seq.write_register_command(slave_address, CMD_START | CMD_READ | CMD_STOP);
 
-			repeat(10) begin
-				#1000
-				api_rw_seq.read_register_data(); // register 0
-				if (api_rw_seq.rsp.data[9:8] & DATA_VALID) break;
-			end
-			rsp = api_rw_seq.rsp;
-			data = rsp.data[7:0];
+			// repeat(10) begin
+			// 	#1000
+			// 	api_rw_seq.read_register_data(); // register 0
+			// 	if (api_rw_seq.rsp.data[9:8] & DATA_VALID) break;
+			// end
+			// rsp = api_rw_seq.rsp;
+			// data = rsp.data[7:0];
 		end
     endtask
 
@@ -89,7 +89,7 @@ class memory_slave_seq extends uvm_sequence #(axil_seq_item);
 		is_write = 0;
 		this.register_address = register_address;
 		start(sequencer);
-		this.data = rsp.data;
+		// this.data = rsp.data;
 	endtask
 endclass
 

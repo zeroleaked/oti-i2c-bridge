@@ -130,7 +130,7 @@ module axil_tb_top;
 		uvm_config_db#(virtual axil_if)::set(null, "*", "axil_vif", axil_vif);
 
     // Start UVM phases and run the test
-		run_test("i2c_master_test");
+		run_test("axil_basic_test");
 	end
 
 
