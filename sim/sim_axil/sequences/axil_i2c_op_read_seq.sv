@@ -28,8 +28,6 @@ class axil_i2c_op_read_seq extends uvm_sequence #(axil_seq_item);
 		do begin
 			read_api.start(m_sequencer);
 		end while (!(read_api.rsp.data[9:8] & DATA_VALID));
-		`uvm_info(get_type_name(), "seq rsp", UVM_LOW)
-		read_api.rsp.print();
 
 		// rest of the bytes
 		for (int i=0; i<data_length-1; i++) begin
@@ -46,8 +44,6 @@ class axil_i2c_op_read_seq extends uvm_sequence #(axil_seq_item);
 			do begin
 				read_api.start(m_sequencer);
 			end while (!(read_api.rsp.data[9:8] & DATA_VALID));
-			`uvm_info(get_type_name(), "seq rsp", UVM_LOW)
-			read_api.rsp.print();
 		end
 
 		// stop

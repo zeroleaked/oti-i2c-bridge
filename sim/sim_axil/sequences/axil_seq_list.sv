@@ -38,20 +38,13 @@ package axil_seq_list;
 	import i2c_master_axil_pkg::*;
 	import bridge_env_pkg::*;
 	import axil_agent_pkg::axil_seq_item;
-	import i2c_agent_pkg::*;
+	import i2c_agent_pkg::i2c_seq_item;
    //////////////////////////////////////////////////////////
    // include top env files 
    /////////////////////////////////////////////////////////
    // TODO: Group related sequences and consider using separate files for complex sequences
-	`include "api_single_rw_seq.sv"
-
-	`include "memory_slave_seq.sv"
-
-	`include "config_seq.sv"
-	`include "write_read_seq.sv"
-
 	// APIs
-	`include "axil_i2c_response_seq.sv"
+	`include "axil_i2c_slave_resp_seq.sv"
 	`include "axil_bus_write_seq.sv"
 	`include "axil_bus_read_seq.sv"
 
@@ -61,7 +54,6 @@ package axil_seq_list;
 
 	`include "axil_basic_vseq.sv"
 
-   // TODO: Add factory registration for all sequences if not done in individual files
 endpackage
 
 `endif
