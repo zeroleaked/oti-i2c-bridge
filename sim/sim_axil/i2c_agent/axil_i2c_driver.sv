@@ -44,7 +44,7 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 						`uvm_info(get_type_name(), "start detected", UVM_LOW)
 						handle_start();
 					end
-					wait(0); // forever
+					else wait(0); // forever
 				end
 				// Detect STOP condition (SDA rising while SCL high)
 				begin
@@ -53,7 +53,7 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 						`uvm_info(get_type_name(), "stop detected", UVM_LOW)
 						handle_stop();
 					end
-					wait(0); // forever
+					else wait(0); // forever
 				end
 				// Normal bit transfer
 				begin

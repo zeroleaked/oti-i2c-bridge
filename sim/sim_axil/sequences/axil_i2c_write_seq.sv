@@ -12,6 +12,8 @@ class axil_i2c_write_seq extends uvm_sequence #(axil_seq_item);
   
 	task body();
 		axil_write_seq api = axil_write_seq::type_id::create("api");
+
+		// address phase
 		api.req.cfg_address = CMD_REG;
 		api.req.cfg_data = {
 			19'h0,
@@ -21,6 +23,7 @@ class axil_i2c_write_seq extends uvm_sequence #(axil_seq_item);
 		};
 		api.start(m_sequencer);
 
+		// data phase
 		for (int i=0; i<data_length; i++) begin
 			api.req.cfg_address = DATA_REG;
 			api.req.cfg_data[15:8] = 8'h0;
@@ -36,6 +39,7 @@ class axil_i2c_write_seq extends uvm_sequence #(axil_seq_item);
 			api.start(m_sequencer);
 		end
 
+		// stop
 		api.req.cfg_address = CMD_REG;
 		api.req.cfg_data = {
 			19'h0,
