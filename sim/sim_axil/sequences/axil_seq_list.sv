@@ -52,6 +52,9 @@ package axil_seq_list;
 
 	`include "axil_i2c_response_seq.sv"
 
+	`include "axil_write_seq.sv"
+	`include "axil_i2c_write_seq.sv"
+
 	`include "axil_basic_vseq.sv"
 
    // TODO: Add factory registration for all sequences if not done in individual files

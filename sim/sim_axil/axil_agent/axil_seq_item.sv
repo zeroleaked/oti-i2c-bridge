@@ -30,6 +30,9 @@ class axil_seq_item extends uvm_sequence_item;
     rand bit [31:0] data;
     rand bit [3:0]  strb;
     rand bit        read;
+
+	bit [3:0] cfg_address;
+	bit [31:0] cfg_data;
     
     `uvm_object_utils_begin(axil_seq_item)
         `uvm_field_int(addr, UVM_ALL_ON)
@@ -38,13 +41,21 @@ class axil_seq_item extends uvm_sequence_item;
         `uvm_field_int(read, UVM_ALL_ON)
     `uvm_object_utils_end
 
+    constraint seq_cfg_address_c {
+        addr == cfg_address;  // 7-bit address range
+    }
+
+    constraint seq_cfg_data_c {
+        data == cfg_data;  // constrain all bytes
+    }
+
+    constraint seq_cfg_data_0_c {
+        data[15:8] == cfg_data[15:8];  // constrain 2nd byte
+    }
+	
     function new(string name = "axil_seq_item");
         super.new(name);
     endfunction
-
-    constraint addr_c {
-        addr inside {[0:3]};
-    }
 endclass
 
 `endif

@@ -105,14 +105,15 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 				received_address = received_address >> 1;  // 7-bit address
 				
 				// Check if this is our address
-				if (received_address == current_item.address) begin
-					// Generate ACK on next SCL
-					wait(!vif.scl_i);
-					vif.sda_o <= 0;
-					@(negedge vif.scl_i);
-					vif.sda_o <= 1;
-				end
-				`uvm_info(get_type_name(), "complete address reception", UVM_LOW)
+				if (current_item != null)
+					if (received_address == current_item.address) begin
+						// Generate ACK on next SCL
+						wait(!vif.scl_i);
+						vif.sda_o <= 0;
+						@(negedge vif.scl_i);
+						vif.sda_o <= 1;
+						`uvm_info(get_type_name(), "complete address reception", UVM_LOW)
+					end
 			end
 		end
 		// Data phase
