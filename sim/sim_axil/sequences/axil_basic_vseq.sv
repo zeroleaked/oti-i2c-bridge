@@ -25,7 +25,7 @@ class axil_basic_vseq extends uvm_sequence;
         `uvm_info("SEQ", "Starting I2C write/read sequence", UVM_MEDIUM)
         mem_slave.configure(axil_sequencer, slave_addr);
 		axil_api.configure(axil_sequencer);
-		i2c_w_api.set_address(slave_addr);
+		i2c_w_api.tx.slave_address = slave_addr;
 		        
 		// do write, then a read
 		fork

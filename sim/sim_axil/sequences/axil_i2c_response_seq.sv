@@ -17,10 +17,6 @@ class i2c_response_seq extends i2c_api_base_seq;
 		finish_item(tx);
 	endtask
 
-	task set_address(input bit [6:0] address);
-		tx.configured_addr = address;
-	endtask
-
 endclass
 
 `endif

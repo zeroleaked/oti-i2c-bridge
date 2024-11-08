@@ -3,11 +3,11 @@
 
 class i2c_w_seq_item extends i2c_seq_item;
     `uvm_object_utils(i2c_w_seq_item);
-	bit [7:0] configured_addr; // set by sequence
+	bit [7:0] slave_address; // set by sequence
 
     // Constraints
     constraint seq_cfg_addr {
-        address == configured_addr;  // 7-bit address range
+        address == slave_address;  // 7-bit address range
     }
     
     constraint write_data_size {
