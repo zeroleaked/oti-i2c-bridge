@@ -57,11 +57,10 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 				end
 				// Normal bit transfer
 				begin
-					@(posedge vif.scl_i);
+					@(negedge vif.scl_i);
 					`uvm_info(get_type_name(), "lets handle transfer", UVM_LOW)
 					// Sample on falling edge of SCL
 					handle_transfer();
-					wait(!vif.scl_i);
 				end
 			join_any
 			disable fork;
@@ -94,6 +93,7 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 
 		// Address reception (first byte after START)
 		if (bit_count < 8) begin
+			wait(vif.scl_i);
 			// Sample address bit
 			received_address[7-bit_count] = vif.sda_i;
 			`uvm_info(get_type_name(), $sformatf("ADDRESS BIT[%d] %h", 7-bit_count, received_address[7-bit_count]), UVM_LOW)
@@ -148,10 +148,11 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 			else begin
 				`uvm_info(get_type_name(), "handle write transaction", UVM_LOW)
 				// Master is writing, we need to receive data
-				if ((bit_count % 8 == 0) & (bit_count != 8)) begin
+
+				// if one byte done, send ack
+				if ((bit_count % 8 == 7) & (bit_count != 8)) begin
 					`uvm_info(get_type_name(), "one byte done, sending ack", UVM_LOW)
 					// Generate ACK
-					wait(!vif.scl_i);
 					vif.sda_o <= 0;
 					@(negedge vif.scl_i);
 					vif.sda_o <= 1;

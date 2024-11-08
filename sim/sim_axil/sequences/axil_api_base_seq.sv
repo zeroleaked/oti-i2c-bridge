@@ -1,13 +1,13 @@
-`ifndef AXIL_I2C_API_BASE_SEQ
-`define AXIL_I2C_API_BASE_SEQ
+`ifndef AXIL_API_BASE_SEQ
+`define AXIL_API_BASE_SEQ
 
-class i2c_api_base_seq extends uvm_sequence #(i2c_seq_item);
-    `uvm_object_utils(i2c_api_base_seq)
+class axil_api_base_seq extends uvm_sequence #(axil_seq_item);
+    `uvm_object_utils(axil_api_base_seq)
 
-	i2c_seq_item trans;
+	axil_seq_item trans;
 	uvm_sequencer_base sequencer;
 
-    function new(string name = "i2c_api_base_seq");
+    function new(string name = "axil_api_base_seq");
         super.new(name);
     endfunction
 

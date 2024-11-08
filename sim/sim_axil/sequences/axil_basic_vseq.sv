@@ -38,6 +38,19 @@ class axil_basic_vseq extends uvm_sequence;
 				// i2c_read_api.start_read(slave_addr, 8'hFA);
 			end
 		join
+		
+		// #1000
+		// // do write, then a read
+		// fork
+		// 	// mem_slave.register_read(reg_addr);
+		// 	mem_slave.register_write(reg_addr, 8'hA5);
+		// 	begin
+        // 		`uvm_info(get_type_name(), "i2c_w_api start", UVM_MEDIUM)
+		// 		i2c_w_api.start(i2c_sequencer);
+        // 		`uvm_info(get_type_name(), "i2c_w_api done", UVM_MEDIUM)
+		// 		// i2c_read_api.start_read(slave_addr, 8'hFA);
+		// 	end
+		// join
 
 		`uvm_info("SEQ", $sformatf("Read data from I2C: %h", mem_slave.data), UVM_LOW)
     endtask
