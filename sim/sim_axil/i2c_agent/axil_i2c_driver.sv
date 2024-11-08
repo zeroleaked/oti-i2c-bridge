@@ -9,6 +9,7 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 
 	// Current transaction being processed
 	i2c_seq_item current_item = null;
+	bit [7:0] current_byte;
 	
 	// Tracking bits
 	protected bit [7:0] received_address;
@@ -131,15 +132,15 @@ class i2c_driver extends uvm_driver #(i2c_seq_item);
 					end
 					bit_count++;
 				end
-				else begin
-					// Drive data bit
-					int data_index = (bit_count+1) / 9 - 1;
+				else if (current_item != null) begin
 					int bit_index = 7 - ((bit_count+1) % 9);
-					
-					if (data_index < current_item.data.size()) begin
-						vif.sda_o <= current_item.data[data_index][bit_index];
+					if ((current_item.data.size() != 0) | (bit_index != 7)) begin
+						// Drive data bit
+						if (bit_index == 7)
+							current_byte = current_item.data.pop_front();
+						vif.sda_o <= current_byte[bit_index];
 						wait(vif.scl_i);
-						`uvm_info(get_type_name(), $sformatf("drive data[%d][%d] %h", data_index, bit_index, current_item.data[data_index][bit_index]), UVM_HIGH)
+						`uvm_info(get_type_name(), $sformatf("drive data[%d] %h", bit_index, current_byte[bit_index]), UVM_HIGH)
 						
 						bit_count++;
 					end

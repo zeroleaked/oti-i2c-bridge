@@ -4,7 +4,7 @@
 class i2c_seq_item extends uvm_sequence_item;
     // Core fields for I2C slave behavior
     rand bit [6:0] address;      // 7-bit address to respond to
-    rand bit [7:0] data[];      // Array of data bytes for read/write
+    rand bit [7:0] data[$];      // Array of data bytes for read/write
     rand bit is_write;
 
 	bit [6:0] cfg_address;
@@ -14,7 +14,7 @@ class i2c_seq_item extends uvm_sequence_item;
     `uvm_object_utils_begin(i2c_seq_item)
         `uvm_field_int(address, UVM_ALL_ON)
         `uvm_field_int(is_write, UVM_ALL_ON)
-        `uvm_field_array_int(data, UVM_ALL_ON)
+        `uvm_field_queue_int(data, UVM_ALL_ON)
     `uvm_object_utils_end
 
     // Constraints
