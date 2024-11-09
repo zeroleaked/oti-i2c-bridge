@@ -38,7 +38,7 @@ class axil_i2c_op_write_seq extends uvm_sequence #(axil_seq_item);
 			end 
 			
 			api.start(m_sequencer);
-			`uvm_info(get_type_name(), $sformatf("Write data register %s", api.rsp.convert2string()), UVM_LOW)
+			`uvm_info(get_type_name(), $sformatf("Write data register %s", api.req.convert2string()), UVM_LOW)
 		end
 
 		// stop

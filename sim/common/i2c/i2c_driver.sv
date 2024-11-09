@@ -42,7 +42,7 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 	protected bit [7:0] captured_addr;
 	
 	// Tracks number of bits processed in current transfer
-	protected int bits_received;
+	protected int bit_count;
 	
 	// Indicates if current transaction is a read operation
 	protected bit is_write_op;
@@ -100,7 +100,7 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 		@(negedge vif.sda_i);
 		if (vif.scl_i) begin
 			`uvm_info(get_type_name(), "START condition detected", UVM_HIGH)
-			bits_received = 0;
+			bit_count = 0;
 			if (current_trans == null)
 				seq_item_port.get_next_item(current_trans);
 		end
@@ -116,7 +116,7 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 				seq_item_port.item_done();
 				current_trans = null;
 			end
-			bits_received = 0;
+			bit_count = 0;
 			vif.sda_o <= 1;  // Release SDA line
 		end
 		else wait(0);  // Not a valid STOP condition
@@ -125,9 +125,9 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 	// Main bit transfer handler - routes to appropriate phase handler
 	protected task handle_bit_transfer();
 		wait(!vif.scl_i);  // Synchronize to SCL low
-		`uvm_info(get_type_name(), $sformatf("Processing bit %0d", bits_received), UVM_HIGH)
+		`uvm_info(get_type_name(), $sformatf("Processing bit %0d", bit_count), UVM_HIGH)
 
-		if (bits_received < 8) begin
+		if (bit_count < 9) begin
 			handle_address_phase();
 		end
 		else begin
@@ -142,17 +142,16 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 	
 	// Process address phase (7-bit address + R/W bit)
 	protected task handle_address_phase();
-		wait(vif.scl_i);  // Wait for clock to sample address bit
-		captured_addr[7-bits_received] = vif.sda_i;
-		
-		`uvm_info(get_type_name(), 
-				$sformatf("Address bit[%0d] = %b", 7-bits_received, captured_addr[7-bits_received]), 
-				UVM_HIGH)
-		
-		bits_received++;
-		
+		if (bit_count < 8) begin
+			wait(vif.scl_i);  // Wait for clock to sample address bit
+			captured_addr[7-bit_count] = vif.sda_i;
+			
+			`uvm_info(get_type_name(), 
+					$sformatf("Address bit[%0d] = %b", 7-bit_count, captured_addr[7-bit_count]), 
+					UVM_HIGH)
+		end
 		// Complete address reception
-		if (bits_received == 8) begin
+		if (bit_count == 8) begin
 			is_write_op = !captured_addr[0];  // R/W bit
 			captured_addr = captured_addr >> 1;  // Extract 7-bit address
 			
@@ -162,13 +161,15 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 				`uvm_info(get_type_name(), "Address matched and acknowledged", UVM_HIGH)
 			end
 		end
+		
+		bit_count++;
 	endtask
 
 	// Handle read data phase (slave transmitting)
 	protected task handle_read_data_phase();
 		`uvm_info(get_type_name(), "Processing read transaction", UVM_HIGH)
 		
-		if (bits_received % 9 == 7) begin
+		if (bit_count % 9 == 7) begin
 			handle_read_byte_completion();
 		end
 		else if (current_trans != null) begin
@@ -186,12 +187,12 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 			`uvm_info(get_type_name(), "Master sent NACK - ending transfer", UVM_HIGH)
 			return;
 		end
-		bits_received++;
+		bit_count++;
 	endtask
 
 	// Drive individual bits during read operation
 	protected task drive_read_data_bit();
-		int bit_index = 7 - ((bits_received+1) % 9);
+		int bit_index = 7 - (bit_count % 9);
 		
 		if ((current_trans.payload_data.size() != 0) | (bit_index != 7)) begin
 			// Load new byte if starting a new byte transmission
@@ -205,7 +206,7 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 					$sformatf("Driving data bit[%0d] = %b", bit_index, byte_buffer[bit_index]), 
 					UVM_HIGH)
 			
-			bits_received++;
+			bit_count++;
 		end
 	endtask
 
@@ -213,16 +214,16 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 	protected task handle_write_data_phase();
 		`uvm_info(get_type_name(), "Processing write transaction", UVM_HIGH)
 		
-		if (bits_received % 9 == 7) begin
+		if (bit_count % 9 == 8) begin
 			send_ack();  // ACK received byte
 			`uvm_info(get_type_name(), "Write byte received and acknowledged", UVM_HIGH)
 		end
-		bits_received++;
+		else wait(vif.scl_i);
+		bit_count++;
 	endtask
 
 	// Send ACK by pulling SDA low for one clock cycle
 	protected task send_ack();
-		@(negedge vif.scl_i);
 		vif.sda_o <= 0;  // ACK by driving SDA low
 		@(negedge vif.scl_i);
 		vif.sda_o <= 1;  // Release SDA
