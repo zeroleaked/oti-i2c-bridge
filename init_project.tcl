@@ -29,6 +29,7 @@ set_property SOURCE_SET sources_1 [get_filesets sim_axil]
 # Add AXIL simulation files
 set sim_axil_files [list \
     "[file normalize "${repo_path}/sim/sim_axil/"]" \
+    "[file normalize "${repo_path}/sim/common/"]" \
 ]
 add_files -fileset sim_axil -scan_for_includes $sim_axil_files
 
@@ -45,6 +46,7 @@ set_property SOURCE_SET sources_1 [get_filesets sim_wb8]
 # Add WB8 simulation files
 set sim_wb8_files [list \
     "[file normalize "${repo_path}/sim/sim_wb8/"]" \
+    "[file normalize "${repo_path}/sim/common/"]" \
 ]
 add_files -fileset sim_wb8 -scan_for_includes $sim_wb8_files
 
@@ -62,6 +64,7 @@ set_property SOURCE_SET sources_1 [get_filesets sim_wb16]
 # Add wb16 simulation files
 set sim_wb16_files [list \
     "[file normalize "${repo_path}/sim/sim_wb16/"]" \
+    "[file normalize "${repo_path}/sim/common/"]" \
 ]
 add_files -fileset sim_wb16 -scan_for_includes $sim_wb16_files
 

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// File: axil_i2c_driver.sv
+// File: i2c_driver.sv
 // Description: UVM Driver for I2C Slave Device
 //
 // This driver implements I2C slave behavior, responding to I2C master transactions
@@ -15,11 +15,11 @@
 //   - Maintains protocol timing through SCL synchronization
 //------------------------------------------------------------------------------
 
-`ifndef AXIL_I2C_DRIVER
-`define AXIL_I2C_DRIVER
+`ifndef I2C_DRIVER
+`define I2C_DRIVER
 
-class axil_i2c_driver extends uvm_driver #(i2c_transaction);
-	`uvm_component_utils(axil_i2c_driver)
+class i2c_driver extends uvm_driver #(i2c_transaction);
+	`uvm_component_utils(i2c_driver)
 
 	//--------------------------------------------------------------------------
 	// Interface and Transaction Variables
@@ -52,7 +52,7 @@ class axil_i2c_driver extends uvm_driver #(i2c_transaction);
 	//--------------------------------------------------------------------------
 	
 	// Constructor
-	function new(string name = "axil_i2c_driver", uvm_component parent = null);
+	function new(string name = "i2c_driver", uvm_component parent = null);
 		super.new(name, parent);
 	endfunction
 

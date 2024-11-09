@@ -78,8 +78,8 @@ graph TD
     - Defines the `i2c_trans` class for I2C transactions.
     - Includes fields for I2C address, data, and read/write operations.
 
-13. **i2c_monitor.sv**
-    - Implements the `i2c_monitor` class that observes I2C bus activity.
+13. **axil_i2c_monitor.sv**
+    - Implements the `axil_i2c_monitor` class that observes I2C bus activity.
     - Converts I2C bus-level activity into transaction objects.
 
 14. **i2c_responder.sv**

@@ -38,7 +38,7 @@ package axil_seq_list;
 	import i2c_master_axil_pkg::*;
 	import bridge_env_pkg::*;
 	import axil_agent_pkg::axil_seq_item;
-	import i2c_agent_pkg::i2c_transaction;
+	import common_i2c_pkg::i2c_transaction;
    //////////////////////////////////////////////////////////
    // include top env files 
    /////////////////////////////////////////////////////////

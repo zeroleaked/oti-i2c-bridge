@@ -35,6 +35,7 @@ package bridge_env_pkg;
   // Import required custom packages
 	import i2c_master_axil_pkg::*;
 	import i2c_agent_pkg::*;
+	import common_i2c_pkg::*;
 	import axil_agent_pkg::*;
 
   // Include environment components
