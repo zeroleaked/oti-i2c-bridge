@@ -43,7 +43,6 @@ package axil_seq_list;
    //////////////////////////////////////////////////////////
    // include top env files 
    /////////////////////////////////////////////////////////
-   // TODO: Group related sequences and consider using separate files for complex sequences
 	// APIs
 	`include "axil_bus_seq.sv"
 
