@@ -104,6 +104,7 @@ class i2c_monitor extends uvm_monitor;
 			`uvm_info(get_type_name(), "STOP condition detected", UVM_HIGH)
 			if (current_trans != null) begin
 				analysis_port.write(current_trans);
+				`uvm_info(get_type_name(), "I2C transaction finished", UVM_LOW)
 				current_trans.print();
 				current_trans = null;
 			end

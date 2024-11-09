@@ -29,7 +29,7 @@ package axil_test_pkg;
 
    // Import custom packages
 	import axil_seq_list::*;
-	import bridge_env_pkg::*;
+	import axil_bridge_env_pkg::*;
 
    // Include test case files
   `include "axil_basic_test.sv"

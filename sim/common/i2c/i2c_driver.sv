@@ -15,8 +15,8 @@
 //   - Maintains protocol timing through SCL synchronization
 //------------------------------------------------------------------------------
 
-`ifndef I2C_DRIVER
-`define I2C_DRIVER
+`ifndef I2C_DRIVER_SV
+`define I2C_DRIVER_SV
 
 class i2c_driver extends uvm_driver #(i2c_transaction);
 	`uvm_component_utils(i2c_driver)

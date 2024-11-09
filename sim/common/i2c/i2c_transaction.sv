@@ -13,8 +13,8 @@
 //   - Supports configuration through external parameters
 //------------------------------------------------------------------------------
 
-`ifndef AXIL_I2C_TRANSACTION
-`define AXIL_I2C_TRANSACTION
+`ifndef I2C_TRANSACTION_SV
+`define I2C_TRANSACTION_SV
 
 class i2c_transaction extends uvm_sequence_item;
     //--------------------------------------------------------------------------

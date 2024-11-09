@@ -2,7 +2,7 @@
 `define AXIL_BASIC_TEST
 
 class axil_basic_test extends uvm_test;
-    bridge_env env;
+    axil_bridge_env env;
     
     `uvm_component_utils(axil_basic_test)
     
@@ -12,7 +12,7 @@ class axil_basic_test extends uvm_test;
     
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-        env = bridge_env::type_id::create("env", this);
+        env = axil_bridge_env::type_id::create("env", this);
     endfunction
 
     task run_phase(uvm_phase phase);
@@ -21,7 +21,7 @@ class axil_basic_test extends uvm_test;
         phase.raise_objection(this);
 
         basic_vseq = axil_basic_vseq::type_id::create("axil_basic_vseq");
-        basic_vseq.configure(env.axil_seqr, env.i2c_seqr);
+        basic_vseq.configure(env.axil_seqr, env.i2c_agent_instance.sequencer);
 
 		// single read/write
 		basic_vseq.single_op_mode = 1;

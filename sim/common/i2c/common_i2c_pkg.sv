@@ -8,12 +8,13 @@
 //
 // Components Included:
 //   - I2C Transaction Class (i2c_transaction.sv)
-//   - I2C Slave Driver Class (i2c_slave_driver.sv)
-//   - I2C Protocol Monitor Class (i2c_protocol_monitor.sv)
+//   - I2C Slave Driver Class (i2c_driver.sv)
+//   - I2C Protocol Monitor Class (i2c_monitor.sv)
+//	 - I2C Response Sequence Class (i2c_response_seq.sv)
 //
 // Dependencies:
 //   - UVM Package
-//   - Interface files must be compiled before this package
+//   - Interface file i2c_interface.sv must be compiled before this package
 //
 // Usage:
 //   - Import this package in your testbench/test files
@@ -23,7 +24,7 @@
 `ifndef COMMON_I2C_PKG_SV
 `define COMMON_I2C_PKG_SV
 
-package i2c_verification_pkg;  // Renamed for clarity
+package common_i2c_pkg;
 
 //--------------------------------------------------------------------------
 // UVM Package Import and Macro Inclusion
@@ -47,6 +48,8 @@ import uvm_pkg::*;
 // Core verification components
 `include "i2c_driver.sv"      // Drives I2C slave protocol
 `include "i2c_monitor.sv"   // Monitors I2C bus activity
+`include "i2c_agent.sv" // Encapsulate driver and monitor
+`include "i2c_response_seq.sv" // I2C slave API sequence
 
 //--------------------------------------------------------------------------
 // Future Extensions
@@ -62,6 +65,6 @@ import uvm_pkg::*;
 	* - Register Block
 	*/
 
-endpackage : i2c_verification_pkg
+endpackage
 
 `endif // COMMON_I2C_PKG_SV

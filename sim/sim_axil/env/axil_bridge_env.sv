@@ -1,7 +1,7 @@
 /*
-* File: bridge_env.sv
+* File: axil_bridge_env.sv
 *
-* This file defines the 'bridge_env' class, which represents the top-level UVM environment
+* This file defines the 'axil_bridge_env' class, which represents the top-level UVM environment
 * for verifying the AXI-Lite to I2C Master Bridge.
 *
 * Key Features:
@@ -16,25 +16,23 @@
 * comprehensive testing of the AXI-Lite to I2C Master Bridge functionality.
 */
 
-`ifndef BRIDGE_ENV
-`define BRIDGE_ENV
+`ifndef AXIL_BRIDGE_ENV
+`define AXIL_BRIDGE_ENV
 
-class bridge_env extends uvm_env;
+class axil_bridge_env extends uvm_env;
+    `uvm_component_utils(axil_bridge_env)
+
     axil_driver    axil_drv;
-	i2c_monitor i2c_mon_new;
     axil_monitor   axil_mon;
     axil_i2c_monitor    i2c_mon;
     uvm_sequencer #(axil_seq_item) axil_seqr;
     scoreboard scbd;
     axil_coverage cov;
 
-    uvm_sequencer #(i2c_transaction) i2c_seqr;
-	i2c_driver i2c_drv;
+	i2c_agent i2c_agent_instance;
 
-    `uvm_component_utils(bridge_env)
-    
     // Constructor
-    function new(string name = "bridge_env", uvm_component parent = null);
+    function new(string name = "axil_bridge_env", uvm_component parent = null);
         super.new(name, parent);
     endfunction
     
@@ -47,12 +45,10 @@ class bridge_env extends uvm_env;
         axil_mon = axil_monitor::type_id::create("axil_mon", this);
         i2c_mon = axil_i2c_monitor::type_id::create("i2c_mon", this);
         axil_seqr = uvm_sequencer#(axil_seq_item)::type_id::create("axil_seqr", this);
-        i2c_seqr = uvm_sequencer#(i2c_transaction)::type_id::create("i2c_seqr", this);
         scbd = scoreboard::type_id::create("scbd", this);
         cov = axil_coverage::type_id::create("cov", this);
 
-        i2c_drv = i2c_driver::type_id::create("i2c_drv", this);  
-        i2c_mon_new = i2c_monitor::type_id::create("i2c_mon_new", this);  
+		i2c_agent_instance = i2c_agent::type_id::create("i2c_agent", this);
     endfunction
     
     // Connect phase: Establish connections between components
@@ -61,9 +57,6 @@ class bridge_env extends uvm_env;
 
         // Connect sequencer to driver
         axil_drv.seq_item_port.connect(axil_seqr.seq_item_export);
-		i2c_drv.seq_item_port.connect(i2c_seqr.seq_item_export);
-
-
 
         // Connect monitors to scoreboard
         axil_mon.ap.connect(scbd.axil_export);

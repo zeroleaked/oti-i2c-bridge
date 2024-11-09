@@ -42,7 +42,6 @@
 module axil_tb_top;
 	import uvm_pkg::*;
 	import axil_test_pkg::*;
-	// import bridge_env_pkg::*;
     
     // Clock and Reset
     reg clk; // Toggles every 5 time units

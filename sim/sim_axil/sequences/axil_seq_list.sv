@@ -35,16 +35,15 @@ package axil_seq_list;
    //////////////////////////////////////////////////////////
    // importing packages : agent,ref model, register ...
    /////////////////////////////////////////////////////////
+	import common_i2c_pkg::*;
 	import i2c_master_axil_pkg::*;
-	import bridge_env_pkg::*;
+	import axil_bridge_env_pkg::*;
 	import axil_agent_pkg::axil_seq_item;
-	import common_i2c_pkg::i2c_transaction;
    //////////////////////////////////////////////////////////
    // include top env files 
    /////////////////////////////////////////////////////////
    // TODO: Group related sequences and consider using separate files for complex sequences
 	// APIs
-	`include "axil_i2c_slave_resp_seq.sv"
 	`include "axil_bus_write_seq.sv"
 	`include "axil_bus_read_seq.sv"
 

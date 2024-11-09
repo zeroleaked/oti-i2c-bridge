@@ -29,20 +29,19 @@ class axil_basic_vseq extends uvm_sequence;
 
     task body();
 		axil_i2c_op_write_seq axil_i2c_write = axil_i2c_op_write_seq::type_id::create("req");
-		axil_i2c_slave_resp_seq i2c_api = axil_i2c_slave_resp_seq::type_id::create("req");
+		i2c_response_seq i2c_api = i2c_response_seq::type_id::create("req");
 
 		axil_i2c_op_read_seq axil_i2c_read = axil_i2c_op_read_seq::type_id::create("req");
 
 		assert (this.randomize())
 		else `uvm_error(get_type_name(), "Randomization failed");
 
-        `uvm_info(get_type_name(), $sformatf("write then read: slave_addr=%0h data_length=%0d", slave_addr, data_length), UVM_LOW)
-
+		// AXIL to I2C write sequence
+        `uvm_info(get_type_name(), $sformatf("write: slave_addr=%0h data_length=%0d", slave_addr, data_length), UVM_LOW)
 		i2c_api.req.cfg_slave_addr = slave_addr;
 		axil_i2c_write.slave_address = slave_addr;
 		axil_i2c_read.slave_address = slave_addr;
 
-		// AXIL to I2C write sequence
 		axil_i2c_write.data_length = data_length;
 		i2c_api.req.cfg_payload_length = 0; // no respond data for write
 		fork
@@ -51,6 +50,7 @@ class axil_basic_vseq extends uvm_sequence;
 		join
 
 		// AXIL to I2C read sequence
+        `uvm_info(get_type_name(), $sformatf("read: slave_addr=%0h data_length=%0d", slave_addr, data_length), UVM_LOW)
 		axil_i2c_read.data_length = data_length;
 		i2c_api.req.cfg_payload_length = data_length;
 		fork
