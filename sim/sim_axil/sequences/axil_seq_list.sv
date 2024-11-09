@@ -35,10 +35,11 @@ package axil_seq_list;
    //////////////////////////////////////////////////////////
    // importing packages : agent,ref model, register ...
    /////////////////////////////////////////////////////////
-	import common_i2c_pkg::*;
 	import i2c_master_axil_pkg::*;
 	import axil_bridge_env_pkg::*;
 	import axil_agent_pkg::axil_seq_item;
+	import common_i2c_pkg::i2c_transaction;
+	import common_i2c_pkg::i2c_response_seq;
    //////////////////////////////////////////////////////////
    // include top env files 
    /////////////////////////////////////////////////////////

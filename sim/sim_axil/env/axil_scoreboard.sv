@@ -85,11 +85,11 @@ class scoreboard extends uvm_scoreboard;
     function void write_i2c(i2c_trans item);
         if(expected_i2c_queue.size() > 0) begin
             i2c_trans expected = expected_i2c_queue.pop_front();
-            // `uvm_info("SCBD", $sformatf("Comparing I2C transaction - Expected: %s, Got: %s",
-            //                            expected.convert2string(), item.convert2string()), UVM_MEDIUM)
+            `uvm_info("SCBD", $sformatf("Comparing I2C transaction - Expected: %s, Got: %s",
+                                       expected.convert2string(), item.convert2string()), UVM_MEDIUM)
             
             if(item.nack) begin
-                // `uvm_info("SCBD", "I2C NACK received - Transaction failed", UVM_MEDIUM)
+                `uvm_info("SCBD", "I2C NACK received - Transaction failed", UVM_MEDIUM)
                 expected_i2c_queue.push_front(expected);
                 return;
             end
