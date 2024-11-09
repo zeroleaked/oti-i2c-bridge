@@ -7,16 +7,18 @@ class axil_i2c_op_read_seq extends axil_i2c_op_base_seq;
 	task do_operation();
 		// address phase and first byte	
 		write_command(CMD_START | CMD_READ);
-		read_data_until_valid();
 
 		// rest of the bytes
 		repeat (payload_data_length-1) begin
 			write_command(CMD_READ);
-			read_data_until_valid();
 		end
 
 		// stop
 		write_command(CMD_STOP);
+
+		// read register
+		repeat (payload_data_length)
+			read_data_until_valid();
 	endtask
 
 	// Check data register until it finds valid data
@@ -26,7 +28,7 @@ class axil_i2c_op_read_seq extends axil_i2c_op_base_seq;
 		do begin
 			api.start(m_sequencer);
 		end while (!(api.rsp.data[9:8] & DATA_VALID));
-		`uvm_info(get_type_name(), $sformatf("Read data register %s", api.rsp.convert2string()), UVM_LOW)
+		`uvm_info(get_type_name(), $sformatf("Read data register response %s", api.rsp.convert2string()), UVM_LOW)
 	endtask
 
     function new(string name = "axil_i2c_op_read_seq");
