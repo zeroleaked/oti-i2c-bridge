@@ -78,6 +78,28 @@ class i2c_transaction extends uvm_sequence_item;
         super.new(name);
     endfunction
 
+	// Convert transaction to string representation
+	function string convert2string();
+		string s;
+		s = $sformatf("\n----------------------------------------");
+		s = {s, $sformatf("\nI2C Transaction: %s", get_name())};
+		s = {s, $sformatf("\n----------------------------------------")};
+		s = {s, $sformatf("\nSlave Address: 0x%0h (%0d)", slave_addr, slave_addr)};
+		s = {s, $sformatf("\nOperation: %s", is_write ? "WRITE" : "READ")};
+		s = {s, $sformatf("\nPayload Length: %0d bytes", payload_data.size())};
+		
+		if (payload_data.size() > 0) begin
+			s = {s, "\nPayload Data (hex):"};
+			for (int i = 0; i < payload_data.size(); i++) begin
+				if (i % 8 == 0) s = {s, "\n"};
+				s = {s, $sformatf(" %02h", payload_data[i])};
+			end
+		end
+		
+		s = {s, "\n----------------------------------------\n"};
+		return s;
+	endfunction
+
 endclass
 
 `endif // AXIL_I2C_SEQ_ITEM_SV

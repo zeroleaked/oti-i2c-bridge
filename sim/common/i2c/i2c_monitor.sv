@@ -103,8 +103,7 @@ class i2c_monitor extends uvm_monitor;
 			`uvm_info(get_type_name(), "STOP condition detected", UVM_HIGH)
 			if (current_trans != null) begin
 				analysis_port.write(current_trans);
-				`uvm_info(get_type_name(), "I2C transaction finished", UVM_LOW)
-				current_trans.print();
+				`uvm_info(get_type_name(), $sformatf("I2C transaction finished %s", current_trans.convert2string()), UVM_LOW)
 				current_trans = null;
 			end
 			bits_received = 0;
