@@ -32,8 +32,8 @@ package i2c_agent_pkg;
    // include top env files 
    /////////////////////////////////////////////////////////
   `include "i2c_trans.sv"
-  `include "i2c_responder.sv"
   `include "axil_i2c_monitor.sv"
+  `include "i2c_responder.sv"
 
   // TODO: Consider adding i2c_config.sv for agent configuration
   // TODO: Add i2c_seq_lib.sv for common I2C sequences

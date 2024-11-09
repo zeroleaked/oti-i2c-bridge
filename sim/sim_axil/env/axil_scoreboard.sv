@@ -37,8 +37,8 @@ class scoreboard extends uvm_scoreboard;
     
     function void write_axil(axil_seq_item item);
 
-    //   `uvm_info("SCBD", $sformatf("Received AXI transaction: addr=%h data=%h read=%b strb=%h", 
-    //             item.addr, item.data, item.read, item.strb), UVM_DEBUG)
+      `uvm_info("SCBD", $sformatf("Received AXI transaction: addr=%h data=%h read=%b strb=%h", 
+                item.addr, item.data, item.read, item.strb), UVM_DEBUG)
         
         if (!item.read) begin // Write transaction
             if (item.addr == DATA_REG) begin
@@ -49,8 +49,8 @@ class scoreboard extends uvm_scoreboard;
                 expected.data = item.data & 8'hFF; // Data byte
                 expected_i2c_queue.push_back(expected);
                 
-                // `uvm_info("SCBD", $sformatf("Queued expected I2C write transaction: addr=%h read=%b data=%h", 
-                //           expected.addr, expected.read, expected.data), UVM_MEDIUM)
+                `uvm_info("SCBD", $sformatf("Queued expected I2C write transaction: addr=%h read=%b data=%h", 
+                          expected.addr, expected.read, expected.data), UVM_MEDIUM)
 			end 
 			// else if ((item.addr == CMD_REG) & item.data[:])
             else if (item.addr == CMD_REG && (item.data[15] == 1'b1)) begin
@@ -60,8 +60,8 @@ class scoreboard extends uvm_scoreboard;
                 expected.read = 1'b1;  // Read transaction
                 expected_i2c_queue.push_back(expected);
                 
-                // `uvm_info("SCBD", $sformatf("Queued expected I2C read transaction: addr=%h read=%b", 
-                //           expected.addr, expected.read), UVM_MEDIUM)
+                `uvm_info("SCBD", $sformatf("Queued expected I2C read transaction: addr=%h read=%b", 
+                          expected.addr, expected.read), UVM_MEDIUM)
             // TODO: Handle other register writes (CMD_REG, etc.)
             end
         end
@@ -70,9 +70,9 @@ class scoreboard extends uvm_scoreboard;
     
     function void report_phase(uvm_phase phase);
         super.report_phase(phase);
-        // `uvm_info("SCBD", $sformatf("Total AXI transactions: %0d", expected_seq.size()), UVM_MEDIUM)
-        // `uvm_info("SCBD", $sformatf("Remaining expected I2C transactions: %0d", 
-                //   expected_i2c_queue.size()), UVM_MEDIUM)
+        `uvm_info("SCBD", $sformatf("Total AXI transactions: %0d", expected_seq.size()), UVM_MEDIUM)
+        `uvm_info("SCBD", $sformatf("Remaining expected I2C transactions: %0d", 
+                  expected_i2c_queue.size()), UVM_MEDIUM)
         
         if(expected_i2c_queue.size() != 0) begin
             foreach(expected_i2c_queue[i]) begin
@@ -99,11 +99,11 @@ class scoreboard extends uvm_scoreboard;
                 `uvm_error("SCBD", $sformatf("I2C Mismatch! Expected: %s, Got: %s", 
                                            expected.convert2string(), item.convert2string()))
             end else begin
-                // `uvm_info("SCBD", "I2C transaction matched!", UVM_LOW)
+                `uvm_info("SCBD", "I2C transaction matched!", UVM_LOW)
             end
         end else begin
-            // `uvm_error("SCBD", $sformatf("Unexpected I2C transaction received: %s", 
-            //                             item.convert2string()))
+            `uvm_error("SCBD", $sformatf("Unexpected I2C transaction received: %s", 
+                                        item.convert2string()))
         end
     endfunction
     
