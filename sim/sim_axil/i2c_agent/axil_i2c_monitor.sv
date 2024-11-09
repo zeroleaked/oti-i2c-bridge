@@ -1,137 +1,181 @@
-`ifndef AXIL_I2C_MONITOR
-`define AXIL_I2C_MONITOR
+//------------------------------------------------------------------------------
+// File: axil_i2c_monitor.sv
+// Description: UVM Monitor for I2C Bus Protocol
+//
+// This monitor observes I2C bus transactions and converts them into UVM transaction
+// objects for analysis. It monitors START/STOP conditions, address phase, and data
+// phase of I2C protocol, supporting both read and write operations.
+//
+// Features:
+//   - Detects START and STOP conditions
+//   - Decodes 7-bit addressing
+//   - Supports both read and write operations
+//   - Handles data transfer with acknowledgment
+//   - Reports transactions via analysis port for scoreboarding
+//------------------------------------------------------------------------------
+
+`ifndef AXIL_I2C_MONITOR_SV
+`define AXIL_I2C_MONITOR_SV
 
 class axil_i2c_monitor extends uvm_monitor;
 	`uvm_component_utils(axil_i2c_monitor)
 
-	// Virtual interface
+	//--------------------------------------------------------------------------
+	// Interface and Analysis Port
+	//--------------------------------------------------------------------------
+	
+	// Interface to observe I2C signals
 	virtual i2c_interface vif;
 
-	// Analysis port to send transactions to scoreboard
-	uvm_analysis_port #(i2c_transaction) analysis_port;
+	// Port to broadcast observed transactions
+	uvm_analysis_port #(i2c_transaction) analysis_port; // Renamed from analysis_port
 
-	// Current transaction being monitored
-	i2c_transaction current_item;
-	bit [7:0]    current_byte;
+	//--------------------------------------------------------------------------
+	// Transaction and State Variables
+	//--------------------------------------------------------------------------
 	
-	// Tracking bits
-	protected bit [7:0] received_address;
-	protected int      bit_count;
-	protected bit      is_read_transaction;
+	// Current transaction being assembled
+	protected i2c_transaction current_trans;
+	
+	// Buffer for collecting data bits
+	protected bit [7:0] byte_buffer;
+	
+	// State tracking variables
+	protected bit [7:0] captured_addr;
+	protected int       bits_received;
+	protected bit       is_read_op;
 
-	// Constructor and build_phase remain the same
+	//--------------------------------------------------------------------------
+	// Methods
+	//--------------------------------------------------------------------------
+	
+	// Constructor
 	function new(string name = "axil_i2c_monitor", uvm_component parent = null);
 		super.new(name, parent);
 		analysis_port = new("analysis_port", this);
 	endfunction
 
+	// Build phase - Get virtual interface
 	function void build_phase(uvm_phase phase);
 		super.build_phase(phase);
 		if (!uvm_config_db#(virtual i2c_interface)::get(this, "", "i2c_vif", vif))
-			`uvm_fatal("NOVIF", "Virtual interface not set for axil_i2c_monitor")
+			`uvm_fatal("NOVIF", {"Virtual interface must be set for: ", get_full_name(), ".vif"})
 	endfunction
 
-	// Main monitor task
-	virtual task run_phase(uvm_phase phase);        
+	//--------------------------------------------------------------------------
+	// Main Monitoring Process
+	//--------------------------------------------------------------------------
+	
+	// Main monitoring task
+	virtual task run_phase(uvm_phase phase);
 		forever begin
 			@(vif.monitor_cb);
-			// necessary to isolate disable fork with fork join
-			fork
-				monitor_i2c_transaction();
-			join
+			fork begin
+				fork
+					monitor_start_condition();
+					monitor_stop_condition();
+					monitor_data_transfer();
+				join_any
+				disable fork;
+			end join
 		end
 	endtask
 
-	// Task to monitor a single I2C transaction
-	protected task monitor_i2c_transaction();
-		fork
-			monitor_start_condition();
-			monitor_stop_condition();
-			monitor_data_transfer();
-		join_any
-		disable fork;
-	endtask
-
-	// Monitor START condition
+	//--------------------------------------------------------------------------
+	// Protocol State Monitoring
+	//--------------------------------------------------------------------------
+	
+	// Detect START condition (SDA falling while SCL high)
 	protected task monitor_start_condition();
 		@(negedge vif.sda_i);
 		if (vif.scl_i) begin
-			`uvm_info(get_type_name(), "start detected", UVM_HIGH)
-			bit_count = 0;
-			current_item = i2c_transaction::type_id::create("current_item");
+			`uvm_info(get_type_name(), "START condition detected", UVM_HIGH)
+			bits_received = 0;
+			current_trans = i2c_transaction::type_id::create("current_trans");
 		end
-		else wait(0);
+		else wait(0);  // Wait for other tasks to finish
 	endtask
 
-	// Monitor STOP condition
+	// Detect STOP condition (SDA rising while SCL high)
 	protected task monitor_stop_condition();
-		@(posedge vif.sda_i)
+		@(posedge vif.sda_i);
 		if (vif.scl_i) begin
-			`uvm_info(get_type_name(), "stop detected", UVM_HIGH)
-			if (current_item != null) begin
-				analysis_port.write(current_item);
-				current_item.print();
-				current_item = null;
+			`uvm_info(get_type_name(), "STOP condition detected", UVM_HIGH)
+			if (current_trans != null) begin
+				analysis_port.write(current_trans);
+				current_trans.print();
+				current_trans = null;
 			end
-			bit_count = 0;
+			bits_received = 0;
 		end
-		else wait(0);
+		else wait(0);  // Wait for other tasks to finish
 	endtask
 
-	// Monitor data transfer
+	// Monitor data bits on SDA during SCL high
 	protected task monitor_data_transfer();
-		wait(!vif.scl_i);
-		`uvm_info(get_type_name(), "handle_transfer starts", UVM_HIGH)
-		`uvm_info(get_type_name(), $sformatf("bit_count = %d", bit_count), UVM_HIGH)
+		wait(!vif.scl_i);  // Wait for SCL low before next bit
+		
+		`uvm_info(get_type_name(), $sformatf("Processing bit %0d", bits_received), UVM_HIGH)
 
-		if (bit_count < 8) handle_address_phase();
-		else handle_data_phase();
+		// Route to appropriate handler based on transaction phase
+		if (bits_received < 8) begin
+			handle_address_phase();
+		end else begin
+			handle_data_phase();
+		end
 	endtask
 
-	// Handle address phase
+	//--------------------------------------------------------------------------
+	// Protocol Phase Handlers
+	//--------------------------------------------------------------------------
+	
+	// Process address phase (7-bit address + R/W bit)
 	protected task handle_address_phase();
 		@(posedge vif.scl_i);
-		received_address[7-bit_count] = vif.sda_i;
-		`uvm_info(get_type_name(), 
-				$sformatf("address [%d] %h", 7-bit_count, received_address[7-bit_count]), 
-				UVM_HIGH)
-		bit_count++;
+		captured_addr[7-bits_received] = vif.sda_i;
 		
-		if (bit_count == 8) begin
-			is_read_transaction = received_address[0];
-			received_address = received_address >> 1;  // 7-bit address
-			current_item.slave_addr = received_address;
-			current_item.is_write = !is_read_transaction;
-			// To be considered for later test cases: should ack be in seq_item?
-			// If yes, uncomment this
-			// @(posedge vif.scl_i);
-			// current_item.address_ack = !vif.sda_i;
+		`uvm_info(get_type_name(), 
+				$sformatf("Address bit[%0d] = %b", 7-bits_received, captured_addr[7-bits_received]), 
+				UVM_HIGH)
+		
+		bits_received++;
+		
+		if (bits_received == 8) begin
+			is_read_op = captured_addr[0];
+			captured_addr = captured_addr >> 1;  // Extract 7-bit address
+			current_trans.slave_addr = captured_addr;
+			current_trans.is_write = !is_read_op;
 		end
 	endtask
 
-	// Handle data phase
+	// Process data phase (8-bit data + ACK/NACK)
 	protected task handle_data_phase();
-		if (bit_count % 9 == 8) begin
+		if (bits_received % 9 == 8) begin
+			// Handle ACK/NACK bit
 			@(posedge vif.scl_i);
 			if (vif.sda_i) begin
-				`uvm_info(get_type_name(), "master nacked, end of transfer", UVM_HIGH)
+				`uvm_info(get_type_name(), "NACK received", UVM_HIGH)
 				return;
 			end
-			bit_count++;
+			bits_received++;
 		end
 		else begin
-			int bit_index = 7 - (bit_count % 9);
+			// Handle data bit
+			int bit_index = 7 - (bits_received % 9);
 			@(posedge vif.scl_i);
-			current_byte[bit_index] = vif.sda_i;
+			byte_buffer[bit_index] = vif.sda_i;
 			
+			// Complete byte received
 			if (bit_index == 0) begin
-				current_item.payload_data.push_back(current_byte);
-				`uvm_info(get_type_name(), $sformatf("Received byte: %h", current_byte), UVM_HIGH)
+				current_trans.payload_data.push_back(byte_buffer);
+				`uvm_info(get_type_name(), 
+						$sformatf("Byte completed: 8'h%h", byte_buffer), 
+						UVM_HIGH)
 			end
-			bit_count++;
+			bits_received++;
 		end
 	endtask
 
 endclass
 
-`endif
+`endif // AXIL_I2C_MONITOR_SV
