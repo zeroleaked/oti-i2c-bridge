@@ -83,7 +83,6 @@ class i2c_transaction extends uvm_sequence_item;
 		string s;
 		s = $sformatf("\n----------------------------------------");
 		s = {s, $sformatf("\nI2C Transaction: %s", get_name())};
-		s = {s, $sformatf("\n----------------------------------------")};
 		s = {s, $sformatf("\nSlave Address: 0x%0h (%0d)", slave_addr, slave_addr)};
 		s = {s, $sformatf("\nOperation: %s", is_write ? "WRITE" : "READ")};
 		s = {s, $sformatf("\nPayload Length: %0d bytes", payload_data.size())};

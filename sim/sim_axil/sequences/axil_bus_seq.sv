@@ -1,11 +1,12 @@
-`ifndef AXIL_BUS_READ_SEQ
-`define AXIL_BUS_READ_SEQ
+`ifndef AXIL_BUS_SEQ
+`define AXIL_BUS_SEQ
 
-class axil_bus_read_seq extends uvm_sequence #(axil_seq_item);
-    `uvm_object_utils(axil_bus_read_seq)
+class axil_bus_seq extends uvm_sequence #(axil_seq_item);
+    `uvm_object_utils(axil_bus_seq)
 	axil_seq_item req;
+	bit is_write;
 
-    function new(string name = "axil_bus_read_seq");
+    function new(string name = "axil_bus_seq");
         super.new(name);
         req = axil_seq_item::type_id::create("req");
     endfunction
@@ -13,7 +14,7 @@ class axil_bus_read_seq extends uvm_sequence #(axil_seq_item);
     task body();
         start_item(req);
 		assert (req.randomize() with {
-			req.read == 1;
+			req.read == !is_write;
 			req.strb == 4'b0011;
 		})
 		else `uvm_error(get_type_name(), "Randomization failed")

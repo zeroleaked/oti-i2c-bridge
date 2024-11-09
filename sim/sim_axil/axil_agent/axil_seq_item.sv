@@ -56,6 +56,18 @@ class axil_seq_item extends uvm_sequence_item;
 	function new(string name = "axil_seq_item");
 		super.new(name);
 	endfunction
+
+	virtual function string convert2string();
+		string s;
+		s = $sformatf("\n----------------------------------------");
+		s = {s, $sformatf("\nAXI-Lite Transaction: %s", get_name())};
+		s = {s, $sformatf("\nAddress: 0x%0h", addr)};
+		s = {s, $sformatf("\nData:    0x%0h", data)};
+		s = {s, $sformatf("\nStrobe:  0x%0h", strb)};
+		s = {s, $sformatf("\nType:    %s", read ? "READ" : "WRITE")};
+		s = {s, $sformatf("\n----------------------------------------")};
+		return s;
+	endfunction
 endclass
 
 `endif

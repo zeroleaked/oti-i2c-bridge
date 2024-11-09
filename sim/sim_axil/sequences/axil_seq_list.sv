@@ -45,8 +45,7 @@ package axil_seq_list;
    /////////////////////////////////////////////////////////
    // TODO: Group related sequences and consider using separate files for complex sequences
 	// APIs
-	`include "axil_bus_write_seq.sv"
-	`include "axil_bus_read_seq.sv"
+	`include "axil_bus_seq.sv"
 
 	// AXI-Lite workers
 	`include "axil_i2c_op_write_seq.sv"

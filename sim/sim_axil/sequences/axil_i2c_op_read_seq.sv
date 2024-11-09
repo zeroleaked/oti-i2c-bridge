@@ -11,50 +11,56 @@ class axil_i2c_op_read_seq extends uvm_sequence #(axil_seq_item);
     endfunction
   
 	task body();
-		axil_bus_write_seq write_api = axil_bus_write_seq::type_id::create("write_api");
-		axil_bus_read_seq read_api = axil_bus_read_seq::type_id::create("write_api");
+		axil_bus_seq api = axil_bus_seq::type_id::create("api");
 
-		// address phase and first byte
-		write_api.req.cfg_address = CMD_REG;
-		write_api.req.cfg_data = {
+		// address phase and first byte	
+		api.is_write = 1;
+		api.req.cfg_address = CMD_REG;
+		api.req.cfg_data = {
 			19'h0,
 			CMD_START | CMD_READ,
 			1'b0,
 			slave_address
 		};
-		write_api.start(m_sequencer);
+		api.start(m_sequencer);
 
-		read_api.req.cfg_address = DATA_REG;
+		api.is_write = 0;
+		api.req.cfg_address = DATA_REG;
 		do begin
-			read_api.start(m_sequencer);
-		end while (!(read_api.rsp.data[9:8] & DATA_VALID));
+			api.start(m_sequencer);
+		end while (!(api.rsp.data[9:8] & DATA_VALID));
+		`uvm_info(get_type_name(), $sformatf("Read data register %s", api.rsp.convert2string()), UVM_LOW)
 
 		// rest of the bytes
 		for (int i=0; i<data_length-1; i++) begin
-			write_api.req.cfg_address = CMD_REG;
-			write_api.req.cfg_data = {
+			api.is_write = 1;
+			api.req.cfg_address = CMD_REG;
+			api.req.cfg_data = {
 				19'h0,
 				CMD_READ,
 				1'b0,
 				slave_address
 			};
-			write_api.start(m_sequencer);
+			api.start(m_sequencer);
 
-			read_api.req.cfg_address = DATA_REG;
+			api.is_write = 0;
+			api.req.cfg_address = DATA_REG;
 			do begin
-				read_api.start(m_sequencer);
-			end while (!(read_api.rsp.data[9:8] & DATA_VALID));
+				api.start(m_sequencer);
+			end while (!(api.rsp.data[9:8] & DATA_VALID));
+			`uvm_info(get_type_name(), $sformatf("Read data register %s", api.rsp.convert2string()), UVM_LOW)
 		end
 
 		// stop
-		write_api.req.cfg_address = CMD_REG;
-		write_api.req.cfg_data = {
+		api.is_write = 1;
+		api.req.cfg_address = CMD_REG;
+		api.req.cfg_data = {
 			19'h0,
 			CMD_STOP,
 			1'b0,
 			slave_address
 		};
-		write_api.start(m_sequencer);
+		api.start(m_sequencer);
 
 	endtask
 

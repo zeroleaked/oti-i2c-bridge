@@ -11,8 +11,9 @@ class axil_i2c_op_write_seq extends uvm_sequence #(axil_seq_item);
     endfunction
   
 	task body();
-		axil_bus_write_seq api = axil_bus_write_seq::type_id::create("api");
-
+		axil_bus_seq api = axil_bus_seq::type_id::create("api");
+		api.is_write = 1;
+		
 		// address phase
 		api.req.cfg_address = CMD_REG;
 		api.req.cfg_data = {
@@ -37,6 +38,7 @@ class axil_i2c_op_write_seq extends uvm_sequence #(axil_seq_item);
 			end 
 			
 			api.start(m_sequencer);
+			`uvm_info(get_type_name(), $sformatf("Write data register %s", api.rsp.convert2string()), UVM_LOW)
 		end
 
 		// stop
