@@ -48,11 +48,12 @@ package axil_seq_list;
 	`include "axil_bus_seq.sv"
 
 	// AXI-Lite workers
-	`include "axil_i2c_op_base_seq.sv"
-	`include "axil_i2c_op_write_seq.sv"
-	`include "axil_i2c_op_read_seq.sv"
+	`include "axil_i2c_op_base_seq.sv" // base sequence for axil worker
+	`include "axil_i2c_op_write_seq.sv" // write to i2c
+	`include "axil_i2c_op_read_seq.sv" // read to i2c
 
-	`include "axil_basic_vseq.sv"
+	// Virtual Sequences
+	`include "axil_basic_vseq.sv" // read or write axil to i2c vseq
 
 endpackage
 

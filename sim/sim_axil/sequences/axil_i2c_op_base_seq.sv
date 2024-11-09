@@ -5,7 +5,7 @@ class axil_i2c_op_base_seq extends uvm_sequence #(axil_seq_item);
     `uvm_object_utils(axil_i2c_op_base_seq)
 	axil_bus_seq api;
 
-	int data_length;
+	int payload_data_length;
 	bit [6:0] slave_address;
 
     function new(string name = "axil_i2c_op_base_seq");
@@ -19,8 +19,10 @@ class axil_i2c_op_base_seq extends uvm_sequence #(axil_seq_item);
 	endtask
 
 	virtual task do_operation();
+		// to be override
 	endtask;
 
+	// write to command register
 	task write_command(bit [4:0] flags);
 		api.is_write = 1;
 		api.req.cfg_address = CMD_REG;

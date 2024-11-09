@@ -10,7 +10,7 @@ class axil_i2c_op_read_seq extends axil_i2c_op_base_seq;
 		read_data_until_valid();
 
 		// rest of the bytes
-		repeat (data_length-1) begin
+		repeat (payload_data_length-1) begin
 			write_command(CMD_READ);
 			read_data_until_valid();
 		end
