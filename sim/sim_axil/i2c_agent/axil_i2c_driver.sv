@@ -1,14 +1,14 @@
 `ifndef AXIL_I2C_DRIVER
 `define AXIL_I2C_DRIVER
 
-class axil_i2c_driver extends uvm_driver #(i2c_seq_item);
+class axil_i2c_driver extends uvm_driver #(i2c_transaction);
 	`uvm_component_utils(axil_i2c_driver)
 
 	// Virtual interface
 	virtual i2c_interface vif;
 
 	// Current transaction being processed
-	i2c_seq_item current_item = null;
+	i2c_transaction current_item = null;
 	bit [7:0] current_byte;
 	
 	// Tracking bits
@@ -103,7 +103,7 @@ class axil_i2c_driver extends uvm_driver #(i2c_seq_item);
 				
 				// Check if this is our address
 				if (current_item != null)
-					if (received_address == current_item.address) begin
+					if (received_address == current_item.slave_addr) begin
 						// Generate ACK on next SCL
 						wait(!vif.scl_i);
 						vif.sda_o <= 0;
@@ -134,10 +134,10 @@ class axil_i2c_driver extends uvm_driver #(i2c_seq_item);
 				end
 				else if (current_item != null) begin
 					int bit_index = 7 - ((bit_count+1) % 9);
-					if ((current_item.data.size() != 0) | (bit_index != 7)) begin
+					if ((current_item.payload_data.size() != 0) | (bit_index != 7)) begin
 						// Drive data bit
 						if (bit_index == 7)
-							current_byte = current_item.data.pop_front();
+							current_byte = current_item.payload_data.pop_front();
 						vif.sda_o <= current_byte[bit_index];
 						wait(vif.scl_i);
 						`uvm_info(get_type_name(), $sformatf("drive data[%d] %h", bit_index, current_byte[bit_index]), UVM_HIGH)

@@ -38,13 +38,13 @@ class axil_basic_vseq extends uvm_sequence;
 
         `uvm_info(get_type_name(), $sformatf("write then read: slave_addr=%0h data_length=%0d", slave_addr, data_length), UVM_LOW)
 
-		i2c_api.req.cfg_address = slave_addr;
+		i2c_api.req.cfg_slave_addr = slave_addr;
 		axil_i2c_write.slave_address = slave_addr;
 		axil_i2c_read.slave_address = slave_addr;
 
 		// AXIL to I2C write sequence
 		axil_i2c_write.data_length = data_length;
-		i2c_api.req.cfg_data_length = 0; // no respond data for write
+		i2c_api.req.cfg_payload_length = 0; // no respond data for write
 		fork
 			axil_i2c_write.start(axil_sequencer);
 			i2c_api.start(i2c_sequencer);
@@ -52,7 +52,7 @@ class axil_basic_vseq extends uvm_sequence;
 
 		// AXIL to I2C read sequence
 		axil_i2c_read.data_length = data_length;
-		i2c_api.req.cfg_data_length = data_length;
+		i2c_api.req.cfg_payload_length = data_length;
 		fork
 			axil_i2c_read.start(axil_sequencer);
 			i2c_api.start(i2c_sequencer);

@@ -35,7 +35,7 @@ package i2c_agent_pkg;
   `include "i2c_monitor.sv"
   `include "i2c_responder.sv"
 
-  `include "axil_i2c_seq_item.sv"
+  `include "i2c_transaction.sv"
   `include "axil_i2c_driver.sv"
   `include "axil_i2c_monitor.sv"
 

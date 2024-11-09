@@ -1,13 +1,13 @@
 `ifndef AXIL_I2C_SLAVE_RESP_SEQ
 `define AXIL_I2C_SLAVE_RESP_SEQ
 
-class axil_i2c_slave_resp_seq extends uvm_sequence #(i2c_seq_item);
+class axil_i2c_slave_resp_seq extends uvm_sequence #(i2c_transaction);
     `uvm_object_utils(axil_i2c_slave_resp_seq)
-	i2c_seq_item req;
+	i2c_transaction req;
 
     function new(string name = "axil_i2c_slave_resp_seq");
         super.new(name);
-		req = i2c_seq_item::type_id::create("req");
+		req = i2c_transaction::type_id::create("req");
     endfunction
   
 	task body();

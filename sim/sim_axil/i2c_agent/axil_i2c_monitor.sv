@@ -8,10 +8,10 @@ class axil_i2c_monitor extends uvm_monitor;
 	virtual i2c_interface vif;
 
 	// Analysis port to send transactions to scoreboard
-	uvm_analysis_port #(i2c_seq_item) analysis_port;
+	uvm_analysis_port #(i2c_transaction) analysis_port;
 
 	// Current transaction being monitored
-	i2c_seq_item current_item;
+	i2c_transaction current_item;
 	bit [7:0] current_byte;
 	
 	// Tracking bits
@@ -68,7 +68,7 @@ class axil_i2c_monitor extends uvm_monitor;
 	// Handle START condition
 	protected task handle_start();
 		bit_count = 0;
-		current_item = i2c_seq_item::type_id::create("current_item");
+		current_item = i2c_transaction::type_id::create("current_item");
 	endtask
 
 	// Handle STOP condition
@@ -97,7 +97,7 @@ class axil_i2c_monitor extends uvm_monitor;
 			if (bit_count == 8) begin
 				is_read_transaction = received_address[0];
 				received_address = received_address >> 1;  // 7-bit address
-				current_item.address = received_address;
+				current_item.slave_addr = received_address;
 				current_item.is_write = !is_read_transaction;
 				
 				// Wait for ACK/NACK
@@ -127,7 +127,7 @@ class axil_i2c_monitor extends uvm_monitor;
 					current_byte[bit_index] = vif.sda_i;
 					
 					if (bit_index == 0) begin
-						current_item.data.push_back(current_byte);
+						current_item.payload_data.push_back(current_byte);
 						`uvm_info(get_type_name(), $sformatf("Received byte: %h", current_byte), UVM_HIGH)
 					end
 					bit_count++;
@@ -147,7 +147,7 @@ class axil_i2c_monitor extends uvm_monitor;
 					current_byte[bit_index] = vif.sda_i;
 					
 					if (bit_index == 0) begin
-						current_item.data.push_back(current_byte);
+						current_item.payload_data.push_back(current_byte);
 						`uvm_info(get_type_name(), $sformatf("Received byte: %h", current_byte), UVM_HIGH)
 					end
 					bit_count++;
