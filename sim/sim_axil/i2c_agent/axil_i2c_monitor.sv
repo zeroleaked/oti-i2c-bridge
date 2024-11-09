@@ -21,11 +21,17 @@ class axil_i2c_monitor extends uvm_monitor;
 	`uvm_component_utils(axil_i2c_monitor)
 
 	//--------------------------------------------------------------------------
-	// Interface and Analysis Port
+	// Interface, Transaction Variables and Analysis Port
 	//--------------------------------------------------------------------------
 	
 	// Interface to observe I2C signals
 	virtual i2c_interface vif;
+
+	// Current transaction being assembled
+	protected i2c_transaction current_trans;
+
+	// Buffer for collecting data bits
+	protected bit [7:0] byte_buffer;
 
 	// Port to broadcast observed transactions
 	uvm_analysis_port #(i2c_transaction) analysis_port; // Renamed from analysis_port
@@ -34,16 +40,11 @@ class axil_i2c_monitor extends uvm_monitor;
 	// Transaction and State Variables
 	//--------------------------------------------------------------------------
 	
-	// Current transaction being assembled
-	protected i2c_transaction current_trans;
-	
-	// Buffer for collecting data bits
-	protected bit [7:0] byte_buffer;
-	
-	// State tracking variables
+	// Address received from master
 	protected bit [7:0] captured_addr;
+
+	// Tracks number of bits received in current transfer
 	protected int       bits_received;
-	protected bit       is_read_op;
 
 	//--------------------------------------------------------------------------
 	// Methods
@@ -74,7 +75,7 @@ class axil_i2c_monitor extends uvm_monitor;
 				fork
 					monitor_start_condition();
 					monitor_stop_condition();
-					monitor_data_transfer();
+					monitor_bit_transfer();
 				join_any
 				disable fork;
 			end join
@@ -112,7 +113,7 @@ class axil_i2c_monitor extends uvm_monitor;
 	endtask
 
 	// Monitor data bits on SDA during SCL high
-	protected task monitor_data_transfer();
+	protected task monitor_bit_transfer();
 		wait(!vif.scl_i);  // Wait for SCL low before next bit
 		
 		`uvm_info(get_type_name(), $sformatf("Processing bit %0d", bits_received), UVM_HIGH)
@@ -141,10 +142,9 @@ class axil_i2c_monitor extends uvm_monitor;
 		bits_received++;
 		
 		if (bits_received == 8) begin
-			is_read_op = captured_addr[0];
+			current_trans.is_write = !captured_addr[0];
 			captured_addr = captured_addr >> 1;  // Extract 7-bit address
 			current_trans.slave_addr = captured_addr;
-			current_trans.is_write = !is_read_op;
 		end
 	endtask
 
@@ -178,4 +178,4 @@ class axil_i2c_monitor extends uvm_monitor;
 
 endclass
 
-`endif // AXIL_I2C_MONITOR_SV
+`endif

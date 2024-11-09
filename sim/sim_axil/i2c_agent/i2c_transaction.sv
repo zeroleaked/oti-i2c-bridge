@@ -5,7 +5,7 @@
 // This sequence item models I2C transactions for verification of an I2C slave
 // interface. It supports both read and write operations with configurable
 // address and data payload. The class includes constraints to ensure valid
-// I2C protocol behavior and configuration options for testing.
+// configuration options for testing.
 //
 // Usage:
 //   - Create and configure instances for I2C transaction scenarios
