@@ -1,56 +1,32 @@
 `ifndef AXIL_I2C_OP_WRITE_SEQ
 `define AXIL_I2C_OP_WRITE_SEQ
 
-class axil_i2c_op_write_seq extends uvm_sequence #(axil_seq_item);
+class axil_i2c_op_write_seq extends axil_i2c_op_base_seq;
     `uvm_object_utils(axil_i2c_op_write_seq)
-	int data_length;
-	bit [6:0] slave_address;
+  
+	task do_operation();
+		write_command(CMD_START | CMD_WR_M);
+
+		// initial write data settings
+		api.req.seq_cfg_data_c.constraint_mode(0); // randomize first byte
+		api.req.cfg_address = DATA_REG;
+
+		repeat (data_length-1) write_data(DATA_DEFAULT);	
+		write_data(DATA_LAST);
+
+		// stop
+		write_command(CMD_STOP);
+	endtask
+
+	task write_data(bit [1:0] flags);
+		api.req.cfg_data[9:8] = flags;
+		api.start(m_sequencer);
+		`uvm_info(get_type_name(), $sformatf("Write data register %s", api.req.convert2string()), UVM_LOW)
+	endtask
 
     function new(string name = "axil_i2c_op_write_seq");
         super.new(name);
     endfunction
-  
-	task body();
-		axil_bus_seq api = axil_bus_seq::type_id::create("api");
-		api.is_write = 1;
-		
-		// address phase
-		api.req.cfg_address = CMD_REG;
-		api.req.cfg_data = {
-			19'h0,
-			CMD_START | CMD_WR_M,
-			1'b0,
-			slave_address
-		};
-		api.start(m_sequencer);
-
-		// data phase
-		for (int i=0; i<data_length; i++) begin
-			api.req.cfg_address = DATA_REG;
-			api.req.cfg_data[15:8] = 8'h0;
-			
-			// randomize first byte			
-			api.req.seq_cfg_data_c.constraint_mode(0);
-
-			// last item
-			if (i == data_length - 1) begin
-				api.req.cfg_data[15:8] |= DATA_LAST;
-			end 
-			
-			api.start(m_sequencer);
-			`uvm_info(get_type_name(), $sformatf("Write data register %s", api.req.convert2string()), UVM_LOW)
-		end
-
-		// stop
-		api.req.cfg_address = CMD_REG;
-		api.req.cfg_data = {
-			19'h0,
-			CMD_STOP,
-			8'h0
-		};
-		api.start(m_sequencer);
-
-	endtask
 
 endclass
 

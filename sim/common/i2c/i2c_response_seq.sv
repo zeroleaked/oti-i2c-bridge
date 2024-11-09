@@ -41,8 +41,8 @@ class i2c_response_seq extends uvm_sequence #(i2c_transaction);
   
 	task body();
 		start_item(req);
-		assert(req.randomize())
-		else `uvm_error(get_type_name(), "Randomization failed");
+		if (!req.randomize())
+			`uvm_error(get_type_name(), "Randomization failed");
 		finish_item(req);
 	endtask
 

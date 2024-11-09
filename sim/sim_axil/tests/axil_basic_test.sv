@@ -17,6 +17,7 @@ class axil_basic_test extends uvm_test;
 
     task run_phase(uvm_phase phase);
         axil_basic_vseq basic_vseq;
+		int multiplier_number = 5;
         
         phase.raise_objection(this);
 
@@ -25,11 +26,13 @@ class axil_basic_test extends uvm_test;
 
 		// single read/write
 		basic_vseq.single_op_mode = 1;
-        repeat (10) basic_vseq.start(null);
+        repeat (multiplier_number) basic_vseq.start_write();
+        repeat (multiplier_number) basic_vseq.start_read();
 
 		// multiple read/write
 		basic_vseq.single_op_mode = 0;
-        repeat (10) basic_vseq.start(null);
+        repeat (multiplier_number) basic_vseq.start_write();
+        repeat (multiplier_number) basic_vseq.start_read();
         
         // TODO: Add more sophisticated test scenarios
         #1000;

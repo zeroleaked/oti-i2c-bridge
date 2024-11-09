@@ -48,6 +48,7 @@ package axil_seq_list;
 	`include "axil_bus_seq.sv"
 
 	// AXI-Lite workers
+	`include "axil_i2c_op_base_seq.sv"
 	`include "axil_i2c_op_write_seq.sv"
 	`include "axil_i2c_op_read_seq.sv"
 
