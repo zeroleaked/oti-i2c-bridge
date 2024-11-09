@@ -9,6 +9,7 @@
 //
 // Response Sequence Strategy:
 // 1. Current Implementation
+//    - Configurable slave address and payload length
 //    - Provides randomized data responses for I2C read operations
 //
 // 2. Future Extensibility
@@ -17,22 +18,6 @@
 //    - Error injection cases
 //    - Timing variation testing
 //    - Protocol violation testing
-//
-// Benefits of Sequence-Based Approach:
-// 1. Modularity
-//    - Each test scenario can have its own sequence class
-//    - Easy to add new test cases without modifying existing code
-//    - Clear separation of concerns between test intent and implementation
-//
-// 2. Reusability
-//    - Common response patterns can be encapsulated and reused
-//    - Reduces code duplication
-//    - Maintains consistency across similar test cases
-//
-// 3. Maintainability
-//    - Centralized control of response behavior
-//    - Easy to modify response patterns for specific test needs
-//    - Clear documentation of test intent
 //
 // Usage:
 // This sequence is typically started from a virtual sequence using:

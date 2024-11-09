@@ -9,8 +9,7 @@
 // Features:
 //   - Detects START and STOP conditions
 //   - Decodes 7-bit addressing
-//   - Supports both read and write operations
-//   - Handles data transfer with acknowledgment
+//   - Supports single and multiple read and write operations
 //   - Reports transactions via analysis port for scoreboarding
 //------------------------------------------------------------------------------
 

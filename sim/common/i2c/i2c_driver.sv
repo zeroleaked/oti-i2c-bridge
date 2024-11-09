@@ -10,7 +10,7 @@
 // Features:
 //   - Responds to I2C START and STOP conditions
 //   - Address matching for targeted slave operations
-//   - Supports both read (slave->master) and write (master->slave) transfers
+//   - Supports single and multiple read and write transfers
 //   - Implements proper I2C acknowledgment handling
 //   - Maintains protocol timing through SCL synchronization
 //------------------------------------------------------------------------------

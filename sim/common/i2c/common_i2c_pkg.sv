@@ -57,12 +57,9 @@ import uvm_pkg::*;
 /*
 	* Planned/Suggested additions:
 	* - I2C Configuration Object
-	* - I2C Sequencer
-	* - I2C Agent
 	* - I2C Scoreboard
 	* - Protocol Coverage Collection
 	* - Reference Model
-	* - Register Block
 	*/
 
 endpackage
