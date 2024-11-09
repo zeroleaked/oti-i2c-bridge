@@ -52,6 +52,10 @@ class axil_seq_item extends uvm_sequence_item;
     constraint seq_cfg_data_0_c {
         data[15:8] == cfg_data[15:8];  // constrain 2nd byte
     }
+
+    constraint addr_c {
+        addr inside {[0:3]};
+    }
 	
     function new(string name = "axil_seq_item");
         super.new(name);

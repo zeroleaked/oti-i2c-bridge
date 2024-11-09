@@ -63,8 +63,8 @@ class axil_monitor extends uvm_monitor;
                 
                 @(vif.monitor_cb iff vif.monitor_cb.bvalid && vif.monitor_cb.bready);
                 
-                // `uvm_info("AXIL_MON", $sformatf("Collected write transaction: addr=%h data=%h", 
-                //          write_tr.addr, write_tr.data), UVM_LOW)
+                `uvm_info("AXIL_MON", $sformatf("Collected write transaction: addr=%h data=%h", 
+                         write_tr.addr, write_tr.data), UVM_HIGH)
                 ap.write(write_tr);
             end
             
@@ -78,8 +78,8 @@ class axil_monitor extends uvm_monitor;
                 @(vif.monitor_cb iff vif.monitor_cb.rvalid && vif.monitor_cb.rready);
                 read_tr.data = vif.monitor_cb.rdata;
                 
-                // `uvm_info("AXIL_MON", $sformatf("Collected read transaction: addr=%h data=%h", 
-                //          read_tr.addr, read_tr.data), UVM_LOW)
+                `uvm_info("AXIL_MON", $sformatf("Collected read transaction: addr=%h data=%h", 
+                         read_tr.addr, read_tr.data), UVM_HIGH)
                 ap.write(read_tr);
             end
         join_any
