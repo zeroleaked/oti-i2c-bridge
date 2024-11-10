@@ -22,23 +22,23 @@ class i2c_transaction extends uvm_sequence_item;
     //--------------------------------------------------------------------------
     
     // Target I2C slave address (7-bit)
-    rand bit [6:0] slave_addr;     // Renamed from 'address' for clarity
+    rand bit [6:0] slave_addr;
     
     // Transaction data payload
-    rand bit [7:0] payload_data[$]; // Renamed from 'data' to avoid confusion with SystemVerilog data type
+    rand bit [7:0] payload_data[$];
     
     // Transaction direction flag
-    rand bit is_write;             // True for write, False for read operations
+    rand bit is_write;
     
     //--------------------------------------------------------------------------
     // Configuration Parameters
     //--------------------------------------------------------------------------
     
     // External configuration for address matching
-    bit [6:0] cfg_slave_addr;      // Renamed from 'cfg_address'
+    bit [6:0] cfg_slave_addr;
     
     // External configuration for expected data length
-    int cfg_payload_length;        // Renamed from 'cfg_data_length'
+    int cfg_payload_length;
     
     //--------------------------------------------------------------------------
     // UVM Automation Macros
