@@ -1,38 +1,20 @@
-`ifndef AXIL_I2C_OP_BASE_SEQ
-`define AXIL_I2C_OP_BASE_SEQ
+`ifndef COMMON_I2C_OP_BASE_SEQ
+`define COMMON_I2C_OP_BASE_SEQ
 
-class axil_i2c_op_base_seq extends uvm_sequence #(axil_seq_item);
-    `uvm_object_utils(axil_i2c_op_base_seq)
+class common_i2c_op_base_seq #(type T=uvm_sequence_item) extends uvm_sequence #(T);
+    `uvm_object_utils(common_i2c_op_base_seq)
 	axil_bus_seq api;
 
 	int payload_data_length;
-	bit [6:0] slave_address;
+	bit [6:0] slave_addr;
 
-    function new(string name = "axil_i2c_op_base_seq");
+    function new(string name = "common_i2c_op_base_seq");
         super.new(name);
     endfunction
     
-	task body();
-		api = axil_bus_seq::type_id::create("api");
-
-		do_operation();
-	endtask
-
-	virtual task do_operation();
-		// to be override
-	endtask;
-
-	// write to command register
-	task write_command(bit [4:0] flags);
-		api.is_write = 1;
-		api.req.cfg_address = CMD_REG;
-		api.req.cfg_data = {
-			19'h0,
-			flags,
-			1'b0,
-			slave_address
-		};
-		api.start(m_sequencer);
+	// must override
+	// implement subsequences to stimulate DUT I2C operation 
+	virtual task body();
 	endtask
 
 endclass

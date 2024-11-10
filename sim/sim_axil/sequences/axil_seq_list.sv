@@ -52,6 +52,7 @@ package axil_seq_list;
 	`include "axil_i2c_op_read_seq.sv" // read to i2c
 
 	// Virtual Sequences
+	`include "base_basic_vseq.sv" // read or write axil to i2c vseq
 	`include "axil_basic_vseq.sv" // read or write axil to i2c vseq
 
 endpackage
