@@ -1,7 +1,7 @@
 `ifndef AXIL_I2C_OP_WRITE_SEQ
 `define AXIL_I2C_OP_WRITE_SEQ
 
-class axil_i2c_op_write_seq extends common_i2c_op_base_seq #(axil_seq_item);
+class axil_i2c_op_write_seq extends common_i2c_op_base_seq;
     `uvm_object_utils(axil_i2c_op_write_seq)
 	
 	task body();

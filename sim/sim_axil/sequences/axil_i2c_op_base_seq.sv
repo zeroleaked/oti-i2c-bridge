@@ -1,7 +1,7 @@
 `ifndef COMMON_I2C_OP_BASE_SEQ
 `define COMMON_I2C_OP_BASE_SEQ
 
-class common_i2c_op_base_seq #(type T=uvm_sequence_item) extends uvm_sequence #(T);
+class common_i2c_op_base_seq extends uvm_sequence;
     `uvm_object_utils(common_i2c_op_base_seq)
 	axil_bus_seq api;
 

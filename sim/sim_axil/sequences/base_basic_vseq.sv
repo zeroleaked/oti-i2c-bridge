@@ -1,7 +1,7 @@
 `ifndef BASE_BASIC_VSEQ
 `define BASE_BASIC_VSEQ
 
-class base_basic_vseq extends uvm_sequence;
+class base_basic_vseq #(type TR=common_i2c_op_base_seq, type TW=common_i2c_op_base_seq) extends uvm_sequence;
 	uvm_sequencer_base axil_sequencer;
 	uvm_sequencer_base i2c_sequencer;
 
@@ -9,7 +9,7 @@ class base_basic_vseq extends uvm_sequence;
 	bit is_write = 0; // write or read
 	
 	// master sequence
-	common_i2c_op_base_seq #(axil_seq_item) axil_worker;
+	common_i2c_op_base_seq axil_worker;
 	
 	// slave sequence
 	i2c_response_seq i2c_api; 
@@ -32,8 +32,11 @@ class base_basic_vseq extends uvm_sequence;
 
     task body();
 		// create subsequences
-		create_worker();
-		i2c_api = i2c_response_seq::type_id::create("req");
+		if (is_write)
+			axil_worker = TW::type_id::create("axil_worker");
+		else
+			axil_worker = TR::type_id::create("axil_worker");
+		i2c_api = i2c_response_seq::type_id::create("i2c_api");
 
 		// do a part of the randomization in vseq level
 		randomize_this();
@@ -48,9 +51,9 @@ class base_basic_vseq extends uvm_sequence;
 	// must be override
 	virtual task create_worker();
 		if (is_write)
-			axil_worker = axil_i2c_op_write_seq::type_id::create("req");
+			axil_worker = TW::type_id::create("req");
 		else
-			axil_worker = axil_i2c_op_read_seq::type_id::create("req");
+			axil_worker = TR::type_id::create("req");
 	endtask
 
 	// randomize payload length and slave address
