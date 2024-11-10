@@ -1,15 +1,14 @@
 `ifndef BASE_BASIC_VSEQ
 `define BASE_BASIC_VSEQ
 
-class base_basic_vseq #(type TR=common_i2c_op_base_seq, type TW=common_i2c_op_base_seq) extends uvm_sequence;
-	uvm_sequencer_base axil_sequencer;
+class base_basic_vseq #(type T=master_i2c_op_base_seq) extends uvm_sequence;
+	uvm_sequencer_base master_sequencer;
 	uvm_sequencer_base i2c_sequencer;
 
-	bit single_op_mode = 0; // single (1) or multiple (0)
-	bit is_write = 0; // write or read
+	bit single_op_mode = 0;
 	
 	// master sequence
-	common_i2c_op_base_seq axil_worker;
+	T master_sequence;
 	
 	// slave sequence
 	i2c_response_seq i2c_api; 
@@ -25,17 +24,14 @@ class base_basic_vseq #(type TR=common_i2c_op_base_seq, type TW=common_i2c_op_ba
 			payload_data_length inside {[1:16]};
 		}
 	}
-	`uvm_object_utils_begin(base_basic_vseq)
+	`uvm_object_utils_begin(base_basic_vseq#(T))
 		`uvm_field_int(slave_addr, UVM_DEFAULT)
 		`uvm_field_int(payload_data_length, UVM_DEFAULT)
 	`uvm_object_utils_end
 
     task body();
 		// create subsequences
-		if (is_write)
-			axil_worker = TW::type_id::create("axil_worker");
-		else
-			axil_worker = TR::type_id::create("axil_worker");
+		master_sequence = T::type_id::create("master_sequence");
 		i2c_api = i2c_response_seq::type_id::create("i2c_api");
 
 		// do a part of the randomization in vseq level
@@ -43,18 +39,10 @@ class base_basic_vseq #(type TR=common_i2c_op_base_seq, type TW=common_i2c_op_ba
 
 		// run subsequences in parallel
 		fork
-			axil_worker.start(axil_sequencer);
+			master_sequence.start(master_sequencer);
 			i2c_api.start(i2c_sequencer);
 		join
     endtask
-
-	// must be override
-	virtual task create_worker();
-		if (is_write)
-			axil_worker = TW::type_id::create("req");
-		else
-			axil_worker = TR::type_id::create("req");
-	endtask
 
 	// randomize payload length and slave address
 	protected task randomize_this();
@@ -64,30 +52,27 @@ class base_basic_vseq #(type TR=common_i2c_op_base_seq, type TW=common_i2c_op_ba
 
 		// apply randomized to each workers
 		i2c_api.req.cfg_slave_addr = slave_addr;
-		axil_worker.slave_addr = slave_addr;
-		axil_worker.payload_data_length = payload_data_length;
-		if (is_write)
-			i2c_api.req.cfg_payload_length = 0; // no respond data for write
-		else
-			i2c_api.req.cfg_payload_length = payload_data_length;
+		master_sequence.slave_addr = slave_addr;
+		master_sequence.payload_data_length = payload_data_length;
+		i2c_api.req.cfg_payload_length = payload_data_length;
 	endtask
 
 	task configure(
-		input uvm_sequencer_base axil_sequencer,
+		input uvm_sequencer_base master_sequencer,
 		input uvm_sequencer_base i2c_sequencer
 		);
 
-		this.axil_sequencer = axil_sequencer;
+		this.master_sequencer = master_sequencer;
 		this.i2c_sequencer = i2c_sequencer;
 	endtask
 
-	task start_write();
-		is_write = 1;
+	task start_single();
+		single_op_mode = 1;
 		start(null);
 	endtask
 
-	task start_read();
-		is_write = 0;
+	task start_multiple();
+		single_op_mode = 0;
 		start(null);
 	endtask
     

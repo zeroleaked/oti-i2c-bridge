@@ -30,6 +30,7 @@ package axil_test_pkg;
    // Import custom packages
 	import axil_seq_list::*;
 	import axil_bridge_env_pkg::*;
+	import common_seq_lib::base_basic_vseq;
 
    // Include test case files
   `include "axil_basic_test.sv"

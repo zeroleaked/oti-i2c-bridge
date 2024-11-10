@@ -1,10 +1,11 @@
 `ifndef AXIL_I2C_OP_WRITE_SEQ
 `define AXIL_I2C_OP_WRITE_SEQ
 
-class axil_i2c_op_write_seq extends common_i2c_op_base_seq;
+class axil_i2c_op_write_seq extends master_i2c_op_base_seq;
     `uvm_object_utils(axil_i2c_op_write_seq)
 	
 	task body();
+		axil_bus_seq api;
 		api = axil_bus_seq::type_id::create("api");
 		api.configure(m_sequencer);
 

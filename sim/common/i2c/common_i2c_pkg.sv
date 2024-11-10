@@ -49,7 +49,6 @@ import uvm_pkg::*;
 `include "i2c_driver.sv"      // Drives I2C slave protocol
 `include "i2c_monitor.sv"   // Monitors I2C bus activity
 `include "i2c_agent.sv" // Encapsulate driver and monitor
-`include "i2c_response_seq.sv" // I2C slave API sequence
 
 //--------------------------------------------------------------------------
 // Future Extensions

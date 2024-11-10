@@ -16,28 +16,35 @@ class axil_basic_test extends uvm_test;
     endfunction
 
     task run_phase(uvm_phase phase);
-        axil_basic_vseq basic_vseq;
 		int multiplier_number = 5;
+
+        base_basic_vseq#(axil_i2c_op_read_seq) read_vseq;
+        base_basic_vseq#(axil_i2c_op_write_seq) write_vseq;
+
+		read_vseq = base_basic_vseq#(axil_i2c_op_read_seq)::
+			type_id::create("read_vseq", this);
+		write_vseq = base_basic_vseq#(axil_i2c_op_write_seq)::
+			type_id::create("write_vseq", this);
         
         phase.raise_objection(this);
 
-        basic_vseq = axil_basic_vseq::type_id::create("axil_basic_vseq");
-        basic_vseq.configure(env.axil_seqr, env.i2c_agent_instance.sequencer);
+        read_vseq.configure(
+			env.axil_seqr, env.i2c_agent_instance.sequencer);
+        write_vseq.configure(
+			env.axil_seqr, env.i2c_agent_instance.sequencer);
 
 		// single read & write
-		basic_vseq.single_op_mode = 1;
-        repeat (multiplier_number) basic_vseq.start_write();
-        repeat (multiplier_number) basic_vseq.start_read();
+        repeat (multiplier_number) read_vseq.start_single();
+        repeat (multiplier_number) write_vseq.start_single();
 
 		// multiple read & write
-		basic_vseq.single_op_mode = 0;
-        repeat (multiplier_number) basic_vseq.start_write();
-        repeat (multiplier_number) basic_vseq.start_read();
+        repeat (multiplier_number) read_vseq.start_multiple();
+        repeat (multiplier_number) write_vseq.start_multiple();
 
 		// multiple back to back read & write
 		repeat (multiplier_number) begin
-			basic_vseq.start_write();
-			basic_vseq.start_read();
+			read_vseq.start_multiple();
+			write_vseq.start_multiple();
 		end
         
         // TODO: Add more sophisticated test scenarios

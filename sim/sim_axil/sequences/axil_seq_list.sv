@@ -39,7 +39,7 @@ package axil_seq_list;
 	import axil_bridge_env_pkg::*;
 	import axil_agent_pkg::axil_seq_item;
 	import common_i2c_pkg::i2c_transaction;
-	import common_i2c_pkg::i2c_response_seq;
+	import common_seq_lib::*;
    //////////////////////////////////////////////////////////
    // include top env files 
    /////////////////////////////////////////////////////////
@@ -47,13 +47,8 @@ package axil_seq_list;
 	`include "axil_bus_seq.sv"
 
 	// AXI-Lite workers
-	`include "axil_i2c_op_base_seq.sv" // base sequence for axil worker
 	`include "axil_i2c_op_write_seq.sv" // write to i2c
 	`include "axil_i2c_op_read_seq.sv" // read to i2c
-
-	// Virtual Sequences
-	`include "base_basic_vseq.sv" // read or write axil to i2c vseq
-	`include "axil_basic_vseq.sv" // read or write axil to i2c vseq
 
 endpackage
 
