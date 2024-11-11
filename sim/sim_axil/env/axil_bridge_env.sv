@@ -72,7 +72,7 @@ class axil_bridge_env extends uvm_env;
         axil_mon.ap.connect(cov.analysis_export);
         `uvm_info("ENV", "All connections completed", UVM_LOW)
 
-		i2c_agnt.driver.set_report_verbosity_level(UVM_HIGH);
+		ref_model.set_report_verbosity_level(UVM_HIGH);
     endfunction
 endclass
 

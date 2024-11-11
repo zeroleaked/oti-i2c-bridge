@@ -123,8 +123,10 @@ class axil_ref_model extends uvm_component;
 		while (i2c_trans.payload_data.size() > read_length) begin
         	i2c_trans.payload_data.pop_back();
     	end
+		`uvm_info(get_type_name(), $sformatf("Length adjusted to %0d",
+			read_length), UVM_HIGH)
 
-		// PROBLEM IF I ADD THIS
+
 		foreach(i2c_trans.payload_data[i]) begin
 			read_data_queue.push_back(i2c_trans.payload_data[i]);
 		end
@@ -147,18 +149,18 @@ class axil_ref_model extends uvm_component;
 			`uvm_info(get_type_name(), "Start bit detected", UVM_HIGH)
 
 			// save slave address, ensure all commands have this address
-			slave_addr = axil_trans.data[7:0];
+			slave_addr = axil_trans.data[6:0];
 			
 			// mark as a new i2c read transaction (1 byte)
 			if (flags & CMD_READ) begin
-				`uvm_info(get_type_name(), "Starting a new read", UVM_HIGH)
+				`uvm_info(get_type_name(), $sformatf("Starting a new read for %h",
+					slave_addr), UVM_HIGH)
 				read_length = 1;				
 			end
 		end else begin
 		
 		// middle of i2c transaction
-		if ((flags & CMD_READ) &
-			slave_addr==axil_trans.data[7:0]) begin
+		if ((flags & CMD_READ) && (slave_addr==axil_trans.data[6:0])) begin
 
 			`uvm_info(get_type_name(), "Continue reading", UVM_HIGH)
 
