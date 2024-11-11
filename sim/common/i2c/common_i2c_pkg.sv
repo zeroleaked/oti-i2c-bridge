@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // File: common_i2c_pkg.sv
-// Description: Common Package for I2C UVM Verification Components
+// Description: Common Package for I2C UVM Verification Slave Agent
 //
 // This package contains all the common components needed for I2C protocol
 // verification. It serves as a central location for all I2C-related verification
