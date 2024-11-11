@@ -1,18 +1,7 @@
-`ifndef BASE_BASIC_VSEQ
-`define BASE_BASIC_VSEQ
+`ifndef BASIC_RD_WR_VSEQ_SV
+`define BASIC_RD_WR_VSEQ_SV
 
-class base_basic_vseq #(type T=master_i2c_op_base_seq) extends uvm_sequence;
-	uvm_sequencer_base master_sequencer;
-	uvm_sequencer_base i2c_sequencer;
-
-	bit single_op_mode = 0;
-	
-	// master sequence
-	T master_sequence;
-	
-	// slave sequence
-	i2c_response_seq i2c_api; 
-    
+class basic_rd_wr_vseq #(type T=master_i2c_op_base_seq) extends uvm_sequence;
 	// randomized variables
 	rand bit [6:0] slave_addr;
 	rand int payload_data_length;
@@ -24,10 +13,21 @@ class base_basic_vseq #(type T=master_i2c_op_base_seq) extends uvm_sequence;
 			payload_data_length inside {[1:16]};
 		}
 	}
-	`uvm_object_utils_begin(base_basic_vseq#(T))
+	`uvm_object_utils_begin(basic_rd_wr_vseq#(T))
 		`uvm_field_int(slave_addr, UVM_DEFAULT)
 		`uvm_field_int(payload_data_length, UVM_DEFAULT)
 	`uvm_object_utils_end
+
+	uvm_sequencer_base master_sequencer;
+	uvm_sequencer_base i2c_sequencer;
+
+	bit single_op_mode = 0;
+	
+	// master sequence
+	T master_sequence;
+	
+	// slave sequence
+	i2c_response_seq i2c_api; 
 
     task body();
 		// create subsequences
@@ -76,7 +76,7 @@ class base_basic_vseq #(type T=master_i2c_op_base_seq) extends uvm_sequence;
 		start(null);
 	endtask
     
-    function new(string name = "base_basic_vseq");
+    function new(string name = "basic_rd_wr_vseq");
         super.new(name);
     endfunction
 endclass

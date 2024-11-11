@@ -18,12 +18,12 @@ class axil_basic_test extends uvm_test;
     task run_phase(uvm_phase phase);
 		int multiplier_number = 5;
 
-        base_basic_vseq#(axil_i2c_op_read_seq) read_vseq;
-        base_basic_vseq#(axil_i2c_op_write_seq) write_vseq;
+        basic_rd_wr_vseq#(axil_i2c_op_read_seq) read_vseq;
+        basic_rd_wr_vseq#(axil_i2c_op_write_seq) write_vseq;
 
-		read_vseq = base_basic_vseq#(axil_i2c_op_read_seq)::
+		read_vseq = basic_rd_wr_vseq#(axil_i2c_op_read_seq)::
 			type_id::create("read_vseq", this);
-		write_vseq = base_basic_vseq#(axil_i2c_op_write_seq)::
+		write_vseq = basic_rd_wr_vseq#(axil_i2c_op_write_seq)::
 			type_id::create("write_vseq", this);
         
         phase.raise_objection(this);
