@@ -49,6 +49,9 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 	
 	// Indicates if current transaction is a read operation
 	protected bit is_write_op;
+	
+	// Indicates if transaction is ongoing
+	protected bit is_ongoing = 0;
 
 	//--------------------------------------------------------------------------
 	// Methods
@@ -105,9 +108,17 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 		if (vif.scl_i) begin
 			`uvm_info(get_type_name(), "START condition detected", UVM_HIGH)
 			bit_count = 0;
-			if (current_trans == null)
+			if (current_trans == null) begin
+				i2c_transaction to_rm;
+
 				seq_item_port.get_next_item(current_trans);
-			drv2rm_port.write(current_trans);
+
+				$cast(to_rm,current_trans.clone());
+				to_rm.set_id_info(current_trans);
+				drv2rm_port.write(to_rm);
+
+				is_ongoing = 1;
+			end
 		end
 		else wait(0);  // Not a valid START condition
 	endtask
@@ -123,6 +134,8 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 			end
 			bit_count = 0;
 			vif.sda_o <= 1;  // Release SDA line
+
+			is_ongoing = 0;
 		end
 		else wait(0);  // Not a valid STOP condition
 	endtask
@@ -174,7 +187,7 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 	protected task handle_read_data_phase();
 		`uvm_info(get_type_name(), "Processing read transaction", UVM_HIGH)
 		
-		if (bit_count % 9 == 7) begin
+		if (bit_count % 9 == 8) begin
 			handle_read_byte_completion();
 		end
 		else if (current_trans != null) begin
@@ -199,11 +212,16 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 	protected task drive_read_data_bit();
 		int bit_index = 7 - (bit_count % 9);
 		
-		if ((current_trans.payload_data.size() != 0) | (bit_index != 7)) begin
+		if (is_ongoing) begin
+
 			// Load new byte if starting a new byte transmission
-			if (bit_index == 7)
+			if (bit_index == 7) begin
 				byte_buffer = current_trans.payload_data.pop_front();
-				
+				`uvm_info(get_type_name(), 
+						$sformatf("byte_buffer=%h", byte_buffer), 
+						UVM_HIGH)
+			end
+
 			vif.sda_o <= byte_buffer[bit_index];
 			wait(vif.scl_i);
 			
