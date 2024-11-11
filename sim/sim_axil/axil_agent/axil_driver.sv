@@ -29,6 +29,9 @@ class axil_driver extends uvm_driver #(axil_seq_item);
     
     `uvm_component_utils(axil_driver)
 
+	// port for reference model
+	uvm_analysis_port#(axil_seq_item) drv2rm_port;
+
     function new(string name, uvm_component parent);
         super.new(name, parent);
     endfunction
@@ -38,6 +41,7 @@ class axil_driver extends uvm_driver #(axil_seq_item);
         if(!uvm_config_db#(virtual axil_if)::get(this, "", "axil_vif", vif)) begin
             `uvm_fatal("NOVIF", $sformatf("Virtual interface not found for %s", get_full_name()))
         end
+		drv2rm_port = new("drv2rm_port", this);
     endfunction
 
     task run_phase(uvm_phase phase);
@@ -46,6 +50,7 @@ class axil_driver extends uvm_driver #(axil_seq_item);
             drive_transaction(req);
 			$cast(rsp,req.clone());
 			rsp.set_id_info(req);
+			drv2rm_port.write(rsp);
             seq_item_port.item_done();
 			seq_item_port.put(rsp);
         end

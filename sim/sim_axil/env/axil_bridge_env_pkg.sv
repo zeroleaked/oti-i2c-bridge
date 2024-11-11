@@ -37,6 +37,8 @@ package axil_bridge_env_pkg;
 	import i2c_agent_pkg::*;
 	import common_i2c_pkg::i2c_agent;
 	import axil_agent_pkg::*;
+	
+	import axil_ref_model_pkg::axil_ref_model;
 
   // Include environment components
   `include "axil_scoreboard.sv"
