@@ -30,7 +30,7 @@ class axil_bridge_env extends uvm_env;
     axil_coverage cov;
 
 	axil_ref_model ref_model;
-	i2c_agent i2c_agent_instance;
+	i2c_agent i2c_agnt;
 
     // Constructor
     function new(string name = "axil_bridge_env", uvm_component parent = null);
@@ -50,7 +50,7 @@ class axil_bridge_env extends uvm_env;
         cov = axil_coverage::type_id::create("cov", this);
 
 		ref_model = axil_ref_model::type_id::create("ref_model", this);
-		i2c_agent_instance = i2c_agent::type_id::create("i2c_agent", this);
+		i2c_agnt = i2c_agent::type_id::create("i2c_agent", this);
     endfunction
     
     // Connect phase: Establish connections between components
@@ -60,8 +60,9 @@ class axil_bridge_env extends uvm_env;
         // Connect sequencer to driver
         axil_drv.seq_item_port.connect(axil_seqr.seq_item_export);
 
-		// Connect driver to reference model
+		// Connect drivers to reference model
 		axil_drv.drv2rm_port.connect(ref_model.axil_imp);
+		i2c_agnt.driver.drv2rm_port.connect(ref_model.i2c_imp);
 
         // Connect monitors to scoreboard
         axil_mon.ap.connect(scbd.axil_export);
@@ -71,7 +72,7 @@ class axil_bridge_env extends uvm_env;
         axil_mon.ap.connect(cov.analysis_export);
         `uvm_info("ENV", "All connections completed", UVM_LOW)
 
-		ref_model.set_report_verbosity_level(UVM_HIGH);
+		i2c_agnt.driver.set_report_verbosity_level(UVM_HIGH);
     endfunction
 endclass
 

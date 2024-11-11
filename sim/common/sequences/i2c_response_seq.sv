@@ -44,6 +44,8 @@ class i2c_response_seq extends uvm_sequence #(i2c_transaction);
 		if (!req.randomize())
 			`uvm_error(get_type_name(), "Randomization failed");
 		finish_item(req);
+		`uvm_info(get_type_name(), $sformatf("I2C prepared response %s",
+			req.convert2string()), UVM_LOW)
 	endtask
 
 endclass

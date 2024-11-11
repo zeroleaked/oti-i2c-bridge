@@ -29,16 +29,16 @@ class axil_basic_test extends uvm_test;
         phase.raise_objection(this);
 
         read_vseq.configure(
-			env.axil_seqr, env.i2c_agent_instance.sequencer);
+			env.axil_seqr, env.i2c_agnt.sequencer);
         write_vseq.configure(
-			env.axil_seqr, env.i2c_agent_instance.sequencer);
+			env.axil_seqr, env.i2c_agnt.sequencer);
 
 		// single read & write
-        repeat (multiplier_number) read_vseq.start_single();
+        // repeat (multiplier_number) read_vseq.start_single();
         // repeat (multiplier_number) write_vseq.start_single();
 
 		// // multiple read & write
-        // repeat (multiplier_number) read_vseq.start_multiple();
+        repeat (multiplier_number) read_vseq.start_multiple();
         // repeat (multiplier_number) write_vseq.start_multiple();
 
 		// // multiple back to back read & write
