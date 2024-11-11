@@ -32,10 +32,13 @@ class axil_ref_model extends uvm_component;
 	// Class Properties
 	//----------------------------------------------------------------------------
 
-	bit master_req = 0;
+	protected bit master_req = 0;
 	protected bit [7:0] read_data_queue[$];
+	protected bit [7:0] write_data_queue[$];
 	protected int read_length = 0;
+	protected int write_length = 0;
 	protected bit [6:0] slave_addr;
+	protected bit is_write;
 
 	//----------------------------------------------------------------------------
 	// Methods
@@ -109,6 +112,7 @@ class axil_ref_model extends uvm_component;
 		else begin
 			case (axil_trans.addr)
 				CMD_REG: write_command();
+				DATA_REG: write_data();
 			endcase
 		end
 		`uvm_info(get_type_name(), {"Reference model sends",
@@ -117,18 +121,27 @@ class axil_ref_model extends uvm_component;
 	
 	task i2c_expected_transaction();
 		wait(master_req);
+		
 		i2c_trans.slave_addr = slave_addr;
 		
-		// Adjust payload_data length if it exceeds read_length
-		while (i2c_trans.payload_data.size() > read_length) begin
-        	i2c_trans.payload_data.pop_back();
-    	end
-		`uvm_info(get_type_name(), $sformatf("Length adjusted to %0d",
-			read_length), UVM_HIGH)
+		if (is_write) begin
+			i2c_trans.payload_data = {};
+			foreach(write_data_queue[i])
+				i2c_trans.payload_data.push_back(write_data_queue[i]);
+		end
 
+		else begin // read
+			// Adjust payload_data length if it exceeds read_length
+			while (i2c_trans.payload_data.size() > read_length) begin
+				i2c_trans.payload_data.pop_back();
+			end
+			`uvm_info(get_type_name(), $sformatf("Length adjusted to %0d",
+				read_length), UVM_HIGH)
 
-		foreach(i2c_trans.payload_data[i]) begin
-			read_data_queue.push_back(i2c_trans.payload_data[i]);
+			// Copy payload to internal queue
+			foreach(i2c_trans.payload_data[i]) begin
+				read_data_queue.push_back(i2c_trans.payload_data[i]);
+			end
 		end
 
 		`uvm_info(get_type_name(), {"Reference model sends",
@@ -155,8 +168,18 @@ class axil_ref_model extends uvm_component;
 			if (flags & CMD_READ) begin
 				`uvm_info(get_type_name(), $sformatf("Starting a new read for %h",
 					slave_addr), UVM_HIGH)
-				read_length = 1;				
+				read_length = 1;
+				is_write = 0;
 			end
+
+			// mark as a new i2c multiple write transaction (0 bytes)
+			if (flags & CMD_WR_M) begin
+				`uvm_info(get_type_name(), $sformatf("Starting a new write for %h",
+					slave_addr), UVM_HIGH)
+				write_length = 0;
+				is_write = 1;
+			end
+
 		end else begin
 		
 		// middle of i2c transaction
@@ -175,6 +198,15 @@ class axil_ref_model extends uvm_component;
 			master_req = 1;
 		end
 		end
+	endtask
+
+	task write_data();
+		bit [1:0] flags = axil_trans.data[9:8];
+
+		write_data_queue.push_back(axil_trans.data[7:0]);
+
+		if (flags & DATA_LAST)
+			master_req = 1;
 	endtask
 
 	//----------------------------------------------------------------------------

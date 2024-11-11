@@ -38,8 +38,8 @@ class axil_basic_test extends uvm_test;
         // repeat (multiplier_number) write_vseq.start_single();
 
 		// // multiple read & write
-        repeat (multiplier_number) read_vseq.start_multiple();
-        // repeat (multiplier_number) write_vseq.start_multiple();
+        // repeat (multiplier_number) read_vseq.start_multiple();
+        repeat (multiplier_number) write_vseq.start_multiple();
 
 		// // multiple back to back read & write
 		// repeat (multiplier_number) begin
