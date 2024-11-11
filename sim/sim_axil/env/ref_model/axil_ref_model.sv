@@ -36,7 +36,6 @@ class axil_ref_model extends uvm_component;
 	protected bit [7:0] read_data_queue[$];
 	protected bit [7:0] write_data_queue[$];
 	protected int read_length = 0;
-	protected int write_length = 0;
 	protected bit [6:0] slave_addr;
 	protected bit is_write;
 
@@ -176,7 +175,6 @@ class axil_ref_model extends uvm_component;
 			if (flags & CMD_WR_M) begin
 				`uvm_info(get_type_name(), $sformatf("Starting a new write for %h",
 					slave_addr), UVM_HIGH)
-				write_length = 0;
 				is_write = 1;
 			end
 
