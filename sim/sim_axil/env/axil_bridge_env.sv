@@ -76,9 +76,9 @@ class axil_bridge_env extends uvm_env;
         axil_mon.ap.connect(cov.analysis_export);
         `uvm_info("ENV", "All connections completed", UVM_LOW)
 
-		axil_mon.set_report_verbosity_level(UVM_MEDIUM);
+		axil_mon.set_report_verbosity_level(UVM_HIGH);
 		scbd.set_report_verbosity_level(UVM_MEDIUM);
-		ref_model.set_report_verbosity_level(UVM_MEDIUM);
+		ref_model.set_report_verbosity_level(UVM_HIGH);
     endfunction
 endclass
 

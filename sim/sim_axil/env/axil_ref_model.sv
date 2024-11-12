@@ -73,32 +73,32 @@ class axil_ref_model extends uvm_component;
 
 	task run_phase(uvm_phase phase);
 		forever begin
-			fork fork
+			fork begin fork
 				begin
 					wait(axil_queue.size() > 0);
-					if (axil_queue.size() > 0) begin
-						axil_trans = axil_queue.pop_front();
-						`uvm_info(get_type_name(), {"Reference model receives axil",
-							axil_trans.convert2string()}, UVM_HIGH)
-						axil_expected_transaction();
-						axil_rm2sb_port.write(axil_trans);
-						`uvm_info(get_type_name(), {"Reference model sends",
-							axil_trans.convert2string()}, UVM_MEDIUM)
-					end
+					axil_trans = axil_queue.pop_front();
+					`uvm_info(get_type_name(), {"Reference model receives axil",
+						axil_trans.convert2string()}, UVM_HIGH)
+					axil_expected_transaction();
+					axil_rm2sb_port.write(axil_trans);
+					`uvm_info(get_type_name(), {"Reference model sends",
+						axil_trans.convert2string()}, UVM_MEDIUM)
+					`uvm_info(get_type_name(), "AXIL ends fork", UVM_HIGH);
 				end
 				begin
-					wait(master_req & (i2c_queue.size() > 0));
-					if (i2c_queue.size() > 0) begin
-						i2c_trans = i2c_queue.pop_front();
-						`uvm_info(get_type_name(), {"Reference model receives i2c",
-							i2c_trans.convert2string()}, UVM_HIGH)
-						i2c_expected_transaction();
-						i2c_rm2sb_port.write(i2c_trans);
-						`uvm_info(get_type_name(), {"Reference model sends",
-							i2c_trans.convert2string()}, UVM_MEDIUM)
-					end
+					wait(master_req && (i2c_queue.size() > 0));
+					i2c_trans = i2c_queue.pop_front();
+					`uvm_info(get_type_name(), {"Reference model receives i2c",
+						i2c_trans.convert2string()}, UVM_HIGH)
+					i2c_expected_transaction();
+					i2c_rm2sb_port.write(i2c_trans);
+					`uvm_info(get_type_name(), {"Reference model sends",
+						i2c_trans.convert2string()}, UVM_MEDIUM)
+					`uvm_info(get_type_name(), "I2C ends fork", UVM_HIGH);
 				end
-			join_any disable fork; join
+			join_any disable fork;
+			`uvm_info(get_type_name(), "End of fork", UVM_HIGH);
+			end join
 		end
 	endtask
 

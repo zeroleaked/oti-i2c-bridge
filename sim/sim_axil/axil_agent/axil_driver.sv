@@ -45,6 +45,9 @@ class axil_driver extends uvm_driver #(axil_seq_item);
     endfunction
 
     task run_phase(uvm_phase phase);
+		// initialize
+        vif.driver_cb.bready <= 0;
+
         forever begin
             seq_item_port.get_next_item(req);
             drive_transaction(req);
@@ -91,6 +94,7 @@ class axil_driver extends uvm_driver #(axil_seq_item);
             vif.driver_cb.bready <= 1;
             @(vif.driver_cb);
             while(!vif.driver_cb.bvalid) @(vif.driver_cb);
+			`uvm_info(get_type_name(), "bvalid high", UVM_LOW);
             vif.driver_cb.bready <= 0;
         end
         // TODO: Add configurable delays between transactions

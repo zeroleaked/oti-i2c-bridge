@@ -41,34 +41,37 @@ class axil_monitor extends uvm_monitor;
     endfunction
 
     task run_phase(uvm_phase phase);
+		@(vif.monitor_cb);
         forever begin
-            axil_seq_item tr = axil_seq_item::type_id::create("tr");
-            collect_transaction(tr);
+            collect_transaction();
         end
     endtask
 
-    task collect_transaction(axil_seq_item tr);
-        fork
+    task collect_transaction;
+		fork begin fork
             begin : write_collection
                 axil_seq_item write_tr;
 				write_tr = axil_seq_item::type_id::create("write_tr");
+				`uvm_info(get_type_name(), "Waiting for write", UVM_HIGH);
 				fork
-					begin: write_address_channel
-						@(vif.monitor_cb iff vif.monitor_cb.awvalid &&
-							vif.monitor_cb.awready);
+					begin: write_address_channel_process
+						wait(vif.monitor_cb.awvalid & vif.monitor_cb.awready);
+
 						write_tr.addr = vif.monitor_cb.awaddr;
 						write_tr.read = 0;
+						`uvm_info(get_type_name(), "Write address retrieved", UVM_HIGH);
 					end
-					begin: write_data_channel
-						@(vif.monitor_cb iff vif.monitor_cb.wvalid && vif.monitor_cb.wready);
+					begin: write_data_channel_process
+						wait(vif.monitor_cb.wvalid & vif.monitor_cb.wready);
 						write_tr.data = vif.monitor_cb.wdata;
 						write_tr.strb = vif.monitor_cb.wstrb;
+						`uvm_info(get_type_name(), "Write data retrieved", UVM_HIGH);
 					end
 				join
                 
-                @(vif.monitor_cb iff vif.monitor_cb.bvalid && vif.monitor_cb.bready);
+                wait(vif.monitor_cb.bvalid & vif.monitor_cb.bready);
                 
-                `uvm_info("AXIL_MON", {"Collected read transaction",
+                `uvm_info(get_type_name(), {"Collected read transaction",
 					write_tr.convert2string()}, UVM_MEDIUM)
                 ap.write(write_tr);
             end
@@ -83,12 +86,14 @@ class axil_monitor extends uvm_monitor;
                 @(vif.monitor_cb iff vif.monitor_cb.rvalid && vif.monitor_cb.rready);
                 read_tr.data = vif.monitor_cb.rdata;
                 
-                `uvm_info("AXIL_MON", {"Collected read transaction",
+                `uvm_info(get_type_name(), {"Collected read transaction",
 					read_tr.convert2string()}, UVM_MEDIUM)
                 ap.write(read_tr);
             end
         join_any
         disable fork;
+						`uvm_info(get_type_name(), "End of fork", UVM_HIGH);
+		end join
     endtask
 
     // TODO: Add method to check for protocol violations

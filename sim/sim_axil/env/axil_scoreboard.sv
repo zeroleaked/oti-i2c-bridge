@@ -67,9 +67,11 @@ class axil_scoreboard extends uvm_scoreboard;
 	task run_phase(uvm_phase phase);
 		super.run_phase(phase);
 		forever begin
+			`uvm_info(get_type_name(), "loop start", UVM_MEDIUM)
 			// Wait for either AXI-Lite or I2C transactions to be available
 			wait((axil_exp_queue.size() > 0 && axil_act_queue.size() > 0) ||
 					(i2c_exp_queue.size() > 0 && i2c_act_queue.size() > 0));
+			`uvm_info(get_type_name(), "loop done waiting", UVM_MEDIUM)
 			
 			if (axil_exp_queue.size() > 0 && axil_act_queue.size() > 0) begin
 				compare_axil_trans();
