@@ -84,9 +84,16 @@ class basic_rd_wr_vseq #(type T=master_i2c_op_base_seq) extends uvm_sequence;
 
         // run subsequences in parallel
         fork
+			begin
             master_sequence.start(master_sequencer);
-            i2c_api.start(i2c_sequencer);
+			`uvm_info(get_type_name(), "Master sequences done", UVM_LOW)
+			end
+			begin
+			i2c_api.start(i2c_sequencer);
+			`uvm_info(get_type_name(), "I2C sequences done", UVM_LOW)
+			end
         join
+		`uvm_info(get_type_name(), "Fork joined", UVM_LOW)
     endtask
 
     //--------------------------------------------------------------------------

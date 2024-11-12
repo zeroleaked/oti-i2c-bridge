@@ -46,6 +46,7 @@ class i2c_response_seq extends uvm_sequence #(i2c_transaction);
 		`uvm_info(get_type_name(), $sformatf("I2C prepared response %s",
 			req.convert2string()), UVM_LOW)
 		finish_item(req);
+		`uvm_info(get_type_name(), "I2C response body sequence done", UVM_LOW)
 	endtask
 
 endclass

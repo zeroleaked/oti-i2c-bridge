@@ -71,11 +71,11 @@ class axil_scoreboard extends uvm_scoreboard;
 	task run_phase(uvm_phase phase);
 		super.run_phase(phase);
 		forever begin
-			`uvm_info(get_type_name(), "loop start", UVM_MEDIUM)
 			// Wait for either AXI-Lite or I2C transactions to be available
-			wait((axil_exp_queue.size() > 0 && axil_act_queue.size() > 0) ||
-					(i2c_exp_queue.size() > 0 && i2c_act_queue.size() > 0));
-			`uvm_info(get_type_name(), "loop done waiting", UVM_MEDIUM)
+			while(!((axil_exp_queue.size() > 0 && axil_act_queue.size() > 0) ||
+					(i2c_exp_queue.size() > 0 && i2c_act_queue.size() > 0))) begin
+						#1;
+					end
 			
 			if (axil_exp_queue.size() > 0 && axil_act_queue.size() > 0) begin
 				compare_axil_trans();
@@ -127,7 +127,7 @@ class axil_scoreboard extends uvm_scoreboard;
 	endtask
 
 	function void report_phase(uvm_phase phase);
-		$display($sformatf("AXI-Lite queue: %d/%d\nI2C queue: %d/%d", axil_act_queue.size(), axil_exp_queue.size(), i2c_act_queue.size(), i2c_exp_queue.size()));
+		$display($sformatf("AXI-Lite queue: %0d/%0d\nI2C queue: %0d/%0d", axil_act_queue.size(), axil_exp_queue.size(), i2c_act_queue.size(), i2c_exp_queue.size()));
 		if ((axil_act_queue.size() != 0) ||(axil_exp_queue.size() != 0)
 		|| (i2c_act_queue.size() != 0) || (i2c_exp_queue.size() != 0)) begin
 			`uvm_error(get_type_name(), $sformatf("Scoreboard queue not depleted"))

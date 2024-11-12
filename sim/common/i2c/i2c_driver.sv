@@ -134,6 +134,7 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 				rsp.set_id_info(current_trans);
 				seq_item_port.put(rsp);
 				current_trans = null;
+				`uvm_info(get_type_name(), "Response sent", UVM_HIGH)
 			end
 			bit_count = 0;
 			vif.sda_o <= 1;  // Release SDA line

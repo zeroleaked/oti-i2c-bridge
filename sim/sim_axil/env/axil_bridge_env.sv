@@ -77,8 +77,7 @@ class axil_bridge_env extends uvm_env;
         `uvm_info("ENV", "All connections completed", UVM_LOW)
 
 		scbd.set_report_verbosity_level(UVM_HIGH);
-		axil_mon.set_report_verbosity_level(UVM_HIGH);
-		// i2c_agnt.driver.set_report_verbosity_level(UVM_HIGH);
+		ref_model.set_report_verbosity_level(UVM_HIGH);
     endfunction
 endclass
 
