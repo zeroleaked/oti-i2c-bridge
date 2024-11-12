@@ -49,8 +49,8 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 	
 	// Indicates if current transaction is a read operation
 	protected bit is_write_op;
-	
-	// Indicates if transaction is ongoing
+
+	// Indicates if read transaction is ongoing
 	protected bit is_ongoing = 0;
 
 	//--------------------------------------------------------------------------
@@ -134,7 +134,6 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 			end
 			bit_count = 0;
 			vif.sda_o <= 1;  // Release SDA line
-
 			is_ongoing = 0;
 		end
 		else wait(0);  // Not a valid STOP condition
@@ -213,7 +212,6 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 		int bit_index = 7 - (bit_count % 9);
 		
 		if (is_ongoing) begin
-
 			// Load new byte if starting a new byte transmission
 			if (bit_index == 7) begin
 				byte_buffer = current_trans.payload_data.pop_front();
