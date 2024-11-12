@@ -36,6 +36,8 @@ class axil_ref_model extends uvm_component;
 	protected bit [7:0] read_data_queue[$];
 	protected bit [7:0] write_data_queue[$];
 	protected int read_length = 0;
+	protected time read_starts;
+	protected time next_valid_read;
 	protected bit [6:0] slave_addr;
 	protected bit is_write;
 
@@ -85,7 +87,7 @@ class axil_ref_model extends uvm_component;
 					axil_trans.convert2string()}, UVM_MEDIUM)
 				`uvm_info(get_type_name(), "AXIL ends fork", UVM_HIGH);
 			end
-// 205000, 245000
+
 			if (master_req && (i2c_queue.size() > 0)) begin
 				i2c_trans = i2c_queue.pop_front();
 				`uvm_info(get_type_name(), {"Reference model receives i2c",
@@ -166,6 +168,9 @@ class axil_ref_model extends uvm_component;
 					slave_addr), UVM_HIGH)
 				read_length = 1;
 				is_write = 0;
+				read_starts = axil_trans.start_time;
+				// TODO: Scale with prescaler register
+				next_valid_read = axil_trans.start_time + 2040;
 			end
 
 			// mark as a new i2c multiple write transaction (0 bytes)
@@ -211,10 +216,20 @@ class axil_ref_model extends uvm_component;
 	// read data register
 	task read_data();
 		bit [7:0] data_from_i2c;
+		time delay = 2040;
+// read command:0/5000, first failed read:205000, success:2045000, success:3045000
+		`uvm_info(get_type_name(), $sformatf("start_time=%0d next_valid_read=%0d",
+			axil_trans.start_time, next_valid_read), UVM_HIGH)
 
-		wait (read_data_queue.size() > 0) begin
+		if (next_valid_read > axil_trans.start_time) begin
+			axil_trans.data = {22'h0, 2'b00, 8'h00};
+		end
+		else begin
 			data_from_i2c = read_data_queue.pop_front();
 			axil_trans.data = {22'h0, DATA_VALID, data_from_i2c};
+
+			// todo: scale with prescaler register
+			next_valid_read += 1000;
 		end
 	endtask
 

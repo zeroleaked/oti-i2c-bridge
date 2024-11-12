@@ -15,15 +15,19 @@ class axil_bus_seq extends uvm_sequence #(axil_seq_item);
     task body();
         start_item(req);
 		if (!req.randomize() with {
-			req.read == !is_write;
-			req.strb == 4'b0011;
+			if (is_write) {
+				req.read == 0;
+				req.strb == 4'b0011;
+			}
+			else {
+				req.read == 1;
+				req.strb == 4'b0000;
+			}
 		})
 			`uvm_error(get_type_name(), "Randomization failed")
 		
         finish_item(req);
 		get_response(rsp);
-		`uvm_info(get_type_name(), {"Response received",
-			rsp.convert2string()}, UVM_LOW)
     endtask
 
 	task configure(uvm_sequencer_base sequencer);
@@ -59,8 +63,6 @@ class axil_bus_seq extends uvm_sequence #(axil_seq_item);
 		req.cfg_address = DATA_REG;
 		do begin
 			start(sequencer);
-			`uvm_info(get_type_name(), {"Response",
-				rsp.convert2string(), $sformatf("%b",(rsp.data[9:8] & DATA_VALID) == 2'h0)}, UVM_LOW)
 		end while ((rsp.data[9:8] & DATA_VALID) == 2'b00);
 		`uvm_info(get_type_name(), $sformatf("Read data register response %s", rsp.convert2string()), UVM_LOW)
 	endtask

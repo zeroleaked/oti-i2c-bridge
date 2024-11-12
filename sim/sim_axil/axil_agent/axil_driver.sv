@@ -53,23 +53,22 @@ class axil_driver extends uvm_driver #(axil_seq_item);
         vif.driver_cb.arvalid <= 0;
 
         forever begin
-			time start_time;
+			axil_seq_item to_rm;
 			
 			// receive from sequencer
             seq_item_port.get_next_item(req);
-			start_time = $time;
-            drive_transaction();
 
 			// send out to reference model
-			req.start_time = start_time;
-			drv2rm_port.write(req);
+			$cast(to_rm,req.clone());
+			to_rm.start_time = $time;
+			drv2rm_port.write(to_rm);
+
+            drive_transaction();
 
 			// return to sequencer
 			$cast(rsp,req.clone());
 			rsp.set_id_info(req);
             seq_item_port.item_done();
-			`uvm_info(get_type_name(), {"Send response",
-				rsp.convert2string()}, UVM_LOW)
 			seq_item_port.put(rsp);
         end
     endtask
@@ -92,8 +91,6 @@ class axil_driver extends uvm_driver #(axil_seq_item);
             while(!vif.driver_cb.rvalid) @(vif.driver_cb);
 			
             req.data = vif.driver_cb.rdata;
-			`uvm_info(get_type_name(), {"Data retrieved for response",
-				req.convert2string()}, UVM_LOW)
 
             vif.driver_cb.rready <= 0;
         end else begin
