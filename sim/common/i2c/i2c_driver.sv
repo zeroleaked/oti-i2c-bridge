@@ -131,7 +131,7 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 			if (current_trans != null) begin
 				seq_item_port.item_done();
 				$cast(rsp,current_trans.clone());
-				rsp.set_id_info(req);
+				rsp.set_id_info(current_trans);
 				seq_item_port.put(rsp);
 				current_trans = null;
 			end
