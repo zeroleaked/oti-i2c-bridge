@@ -16,7 +16,7 @@ class axil_basic_test extends uvm_test;
     endfunction
 
     task run_phase(uvm_phase phase);
-		int multiplier_number = 5;
+		int multiplier_number = 2;
 
         basic_rd_wr_vseq#(axil_i2c_op_read_seq) read_vseq;
         basic_rd_wr_vseq#(axil_i2c_op_write_seq) write_vseq;
@@ -34,18 +34,18 @@ class axil_basic_test extends uvm_test;
 			env.axil_seqr, env.i2c_agnt.sequencer);
 
 		// single read & write
-        // repeat (multiplier_number) read_vseq.start_single();
-        // repeat (multiplier_number) write_vseq.start_single();
+        repeat (multiplier_number) read_vseq.start_single();
+        repeat (multiplier_number) write_vseq.start_single();
 
 		// multiple read & write
         repeat (multiplier_number) read_vseq.start_multiple();
         repeat (multiplier_number) write_vseq.start_multiple();
 
-		// // multiple back to back read & write
-		// repeat (multiplier_number) begin
-		// 	read_vseq.start_multiple();
-		// 	write_vseq.start_multiple();
-		// end
+		// multiple back to back read & write
+		repeat (multiplier_number) begin
+			read_vseq.start_multiple();
+			write_vseq.start_multiple();
+		end
         
         // TODO: Add more sophisticated test scenarios
         #1000;

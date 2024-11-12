@@ -103,7 +103,7 @@ class axil_scoreboard extends uvm_scoreboard;
 		// end
 
 		if (!exp_trans.compare(act_trans)) begin
-			`uvm_error(get_type_name(), $sformatf("AXI-Lite transaction mismatch:\nExpected:\n%s\nActual:\n%s", exp_trans.sprint(), act_trans.sprint()))
+			`uvm_error(get_type_name(), $sformatf("AXI-Lite transaction mismatch:\nExpected:%s\nActual:%s", exp_trans.convert2string(), act_trans.convert2string()))
 			error = 1;
 		end else begin
 			`uvm_info(get_type_name(), {"AXI-Lite transaction matched",

@@ -48,7 +48,7 @@ class basic_rd_wr_vseq #(type T=master_i2c_op_base_seq) extends uvm_sequence;
             payload_data_length == 1;
         } else {
             // limit maximum length to 16 bytes
-            payload_data_length inside {[2:2]};
+            payload_data_length inside {[2:16]};
         }
     }
 
@@ -84,14 +84,8 @@ class basic_rd_wr_vseq #(type T=master_i2c_op_base_seq) extends uvm_sequence;
 
         // run subsequences in parallel
         fork
-			begin
             master_sequence.start(master_sequencer);
-			`uvm_info(get_type_name(), "Master sequences done", UVM_LOW)
-			end
-			begin
 			i2c_api.start(i2c_sequencer);
-			`uvm_info(get_type_name(), "I2C sequences done", UVM_LOW)
-			end
         join
     endtask
 
