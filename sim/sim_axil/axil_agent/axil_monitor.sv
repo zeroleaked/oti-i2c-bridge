@@ -51,14 +51,20 @@ class axil_monitor extends uvm_monitor;
         fork
             begin : write_collection
                 axil_seq_item write_tr;
-                @(vif.monitor_cb iff vif.monitor_cb.awvalid && vif.monitor_cb.awready);
-                write_tr = axil_seq_item::type_id::create("write_tr");
-                write_tr.addr = vif.monitor_cb.awaddr;
-                write_tr.read = 0;
-                
-                @(vif.monitor_cb iff vif.monitor_cb.wvalid && vif.monitor_cb.wready);
-                write_tr.data = vif.monitor_cb.wdata;
-                write_tr.strb = vif.monitor_cb.wstrb;
+				fork
+					begin: write_address_channel
+						@(vif.monitor_cb iff vif.monitor_cb.awvalid &&
+							vif.monitor_cb.awready);
+						write_tr = axil_seq_item::type_id::create("write_tr");
+						write_tr.addr = vif.monitor_cb.awaddr;
+						write_tr.read = 0;
+					end
+					begin: write_data_channel
+						@(vif.monitor_cb iff vif.monitor_cb.wvalid && vif.monitor_cb.wready);
+						write_tr.data = vif.monitor_cb.wdata;
+						write_tr.strb = vif.monitor_cb.wstrb;
+					end
+				join
                 
                 @(vif.monitor_cb iff vif.monitor_cb.bvalid && vif.monitor_cb.bready);
                 
