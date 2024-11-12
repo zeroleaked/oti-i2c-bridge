@@ -92,15 +92,15 @@ class axil_scoreboard extends uvm_scoreboard;
 		exp_trans = axil_exp_queue.pop_front();
 		act_trans = axil_act_queue.pop_front();
 
-		// todo: ref model to model DUT timing
-		// for now, don't compare invalid data reads
-		if ((act_trans.addr==DATA_REG) && (act_trans.read)
-			// && !(act_trans.data[9:8] & DATA_VALID)
-			) begin
+		// // todo: ref model to model DUT timing
+		// // for now, don't compare invalid data reads
+		// if ((act_trans.addr==DATA_REG) && (act_trans.read)
+		// 	// && !(act_trans.data[9:8] & DATA_VALID)
+		// 	) begin
 			
-			`uvm_info(get_type_name(), "Non valid read skipped", UVM_MEDIUM)
-			return;
-		end
+		// 	`uvm_info(get_type_name(), "Non valid read skipped", UVM_MEDIUM)
+		// 	return;
+		// end
 
 		if (!exp_trans.compare(act_trans)) begin
 			`uvm_error(get_type_name(), $sformatf("AXI-Lite transaction mismatch:\nExpected:\n%s\nActual:\n%s", exp_trans.sprint(), act_trans.sprint()))

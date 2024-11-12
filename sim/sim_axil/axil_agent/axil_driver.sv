@@ -45,22 +45,36 @@ class axil_driver extends uvm_driver #(axil_seq_item);
     endfunction
 
     task run_phase(uvm_phase phase);
-		// initialize control outputs
+		// initialize outputs
         vif.driver_cb.bready <= 0;
         vif.driver_cb.rready <= 0;
+        vif.driver_cb.araddr <= 0;
+        vif.driver_cb.arprot <= 0;
+        vif.driver_cb.arvalid <= 0;
 
         forever begin
+			time start_time;
+			
+			// receive from sequencer
             seq_item_port.get_next_item(req);
-            drive_transaction(req);
+			start_time = $time;
+            drive_transaction();
+
+			// send out to reference model
+			req.start_time = start_time;
+			drv2rm_port.write(req);
+
+			// return to sequencer
 			$cast(rsp,req.clone());
 			rsp.set_id_info(req);
-			drv2rm_port.write(rsp);
             seq_item_port.item_done();
+			`uvm_info(get_type_name(), {"Send response",
+				rsp.convert2string()}, UVM_LOW)
 			seq_item_port.put(rsp);
         end
     endtask
 
-    task drive_transaction(axil_seq_item req);
+    task drive_transaction();
         // TODO: Add proper reset handling here
 
         if(req.read) begin
@@ -76,7 +90,11 @@ class axil_driver extends uvm_driver #(axil_seq_item);
             vif.driver_cb.rready <= 1;
             @(vif.driver_cb);
             while(!vif.driver_cb.rvalid) @(vif.driver_cb);
+			
             req.data = vif.driver_cb.rdata;
+			`uvm_info(get_type_name(), {"Data retrieved for response",
+				req.convert2string()}, UVM_LOW)
+
             vif.driver_cb.rready <= 0;
         end else begin
             @(vif.driver_cb);

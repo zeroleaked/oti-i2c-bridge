@@ -85,7 +85,7 @@ class axil_ref_model extends uvm_component;
 					axil_trans.convert2string()}, UVM_MEDIUM)
 				`uvm_info(get_type_name(), "AXIL ends fork", UVM_HIGH);
 			end
-
+// 205000, 245000
 			if (master_req && (i2c_queue.size() > 0)) begin
 				i2c_trans = i2c_queue.pop_front();
 				`uvm_info(get_type_name(), {"Reference model receives i2c",
@@ -187,7 +187,7 @@ class axil_ref_model extends uvm_component;
 
 		end else
 
-		// end of i2c_transaction
+		// end of i2c read transaction
 		if (flags & CMD_STOP) begin
 			`uvm_info(get_type_name(), "Stop reading", UVM_HIGH)
 			master_req = 1;

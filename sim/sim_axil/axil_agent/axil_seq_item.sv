@@ -31,6 +31,8 @@ class axil_seq_item extends uvm_sequence_item;
 	rand bit [3:0]  strb;
 	rand bit        read;
 
+	time start_time;
+
 	bit [3:0] cfg_address;
 	bit [31:0] cfg_data;
 	
@@ -65,6 +67,7 @@ class axil_seq_item extends uvm_sequence_item;
 		s = {s, $sformatf("\nData:    0x%0h", data)};
 		s = {s, $sformatf("\nStrobe:  0x%0h", strb)};
 		s = {s, $sformatf("\nType:    %s", read ? "READ" : "WRITE")};
+		s = {s, $sformatf("\nStart Time: %0t", start_time)};
 		s = {s, $sformatf("\n----------------------------------------")};
 		return s;
 	endfunction

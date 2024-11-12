@@ -52,6 +52,7 @@ class axil_monitor extends uvm_monitor;
             begin : write_collection
                 axil_seq_item write_tr;
 				write_tr = axil_seq_item::type_id::create("write_tr");
+				write_tr.start_time = $time;
 				`uvm_info(get_type_name(), "Waiting for write", UVM_HIGH);
 				fork
 					begin: write_address_channel_process
@@ -78,9 +79,10 @@ class axil_monitor extends uvm_monitor;
             
             begin : read_collection
                 axil_seq_item read_tr;
+                read_tr = axil_seq_item::type_id::create("read_tr");
+				read_tr.start_time = $time;
 				`uvm_info(get_type_name(), "Waiting for read", UVM_HIGH);
                 wait(vif.monitor_cb.arvalid && vif.monitor_cb.arready);
-                read_tr = axil_seq_item::type_id::create("read_tr");
                 read_tr.addr = vif.monitor_cb.araddr;
                 read_tr.read = 1;
 				`uvm_info(get_type_name(), "Read address retrieved", UVM_HIGH);
