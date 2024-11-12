@@ -82,6 +82,8 @@ class axil_ref_model extends uvm_component;
 							axil_trans.convert2string()}, UVM_HIGH)
 						axil_expected_transaction();
 						axil_rm2sb_port.write(axil_trans);
+						`uvm_info(get_type_name(), {"Reference model sends",
+							axil_trans.convert2string()}, UVM_MEDIUM)
 					end
 				end
 				begin
@@ -92,6 +94,8 @@ class axil_ref_model extends uvm_component;
 							i2c_trans.convert2string()}, UVM_HIGH)
 						i2c_expected_transaction();
 						i2c_rm2sb_port.write(i2c_trans);
+						`uvm_info(get_type_name(), {"Reference model sends",
+							i2c_trans.convert2string()}, UVM_MEDIUM)
 					end
 				end
 			join_any disable fork; join
@@ -114,8 +118,6 @@ class axil_ref_model extends uvm_component;
 				DATA_REG: write_data();
 			endcase
 		end
-		`uvm_info(get_type_name(), {"Reference model sends",
-			axil_trans.convert2string()}, UVM_HIGH)
 	endtask
 	
 	task i2c_expected_transaction();
@@ -142,9 +144,6 @@ class axil_ref_model extends uvm_component;
 				read_data_queue.push_back(i2c_trans.payload_data[i]);
 			end
 		end
-
-		`uvm_info(get_type_name(), {"Reference model sends",
-			i2c_trans.convert2string()}, UVM_HIGH)
 		master_req = 0;
 	endtask
 

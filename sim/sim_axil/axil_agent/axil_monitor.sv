@@ -44,7 +44,6 @@ class axil_monitor extends uvm_monitor;
         forever begin
             axil_seq_item tr = axil_seq_item::type_id::create("tr");
             collect_transaction(tr);
-            ap.write(tr);
         end
     endtask
 
@@ -63,8 +62,8 @@ class axil_monitor extends uvm_monitor;
                 
                 @(vif.monitor_cb iff vif.monitor_cb.bvalid && vif.monitor_cb.bready);
                 
-                `uvm_info("AXIL_MON", $sformatf("Collected write transaction: addr=%h data=%h", 
-                         write_tr.addr, write_tr.data), UVM_MEDIUM)
+                `uvm_info("AXIL_MON", {"Collected read transaction",
+					write_tr.convert2string()}, UVM_MEDIUM)
                 ap.write(write_tr);
             end
             
@@ -78,17 +77,13 @@ class axil_monitor extends uvm_monitor;
                 @(vif.monitor_cb iff vif.monitor_cb.rvalid && vif.monitor_cb.rready);
                 read_tr.data = vif.monitor_cb.rdata;
                 
-                `uvm_info("AXIL_MON", $sformatf("Collected read transaction: addr=%h data=%h", 
-                         read_tr.addr, read_tr.data), UVM_MEDIUM)
+                `uvm_info("AXIL_MON", {"Collected read transaction",
+					read_tr.convert2string()}, UVM_MEDIUM)
                 ap.write(read_tr);
             end
         join_any
         disable fork;
     endtask
-    // TODO: Add coverage collection method
-    // function void collect_coverage(axil_seq_item item);
-    //     // Implement coverage collection logic here
-    // endfunction
 
     // TODO: Add method to check for protocol violations
     // function void check_protocol_compliance(axil_seq_item item);
