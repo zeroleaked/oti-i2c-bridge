@@ -67,7 +67,6 @@ class axil_scoreboard extends uvm_scoreboard;
 	task run_phase(uvm_phase phase);
 		super.run_phase(phase);
 		forever begin
-			// `uvm_info(get_type_name(), $sformatf("exp_q:%d act_q:%d", axil_exp_queue.size(), axil_act_queue.size()), UVM_LOW)
 			// Wait for either AXI-Lite or I2C transactions to be available
 			wait((axil_exp_queue.size() > 0 && axil_act_queue.size() > 0) ||
 					(i2c_exp_queue.size() > 0 && i2c_act_queue.size() > 0));
@@ -89,12 +88,14 @@ class axil_scoreboard extends uvm_scoreboard;
 
 		`uvm_info(get_type_name(), $sformatf({"Comparing AXI-Lite transactions:",
 			"\nExpected:\n%s\nActual:\n%s"}, exp_trans.sprint(), act_trans.sprint()),
-			UVM_LOW)
+			UVM_HIGH)
 
 		if (!exp_trans.compare(act_trans)) begin
 			`uvm_error(get_type_name(), $sformatf("AXI-Lite transaction mismatch:\nExpected:\n%s\nActual:\n%s", exp_trans.sprint(), act_trans.sprint()))
 			error = 1;
 		end else begin
+			`uvm_info(get_type_name(), {"AXI-Lite transaction matched",
+				act_trans.convert2string()}, UVM_MEDIUM)
 		end
 	endtask
 
@@ -104,16 +105,15 @@ class axil_scoreboard extends uvm_scoreboard;
 		exp_trans = i2c_exp_queue.pop_front();
 		act_trans = i2c_act_queue.pop_front();
 
-		`uvm_info(get_type_name(), $sformatf("Comparing I2C transactions:\nExpected:\n%s\nActual:\n%s", exp_trans.sprint(), act_trans.sprint()), UVM_LOW)
+		`uvm_info(get_type_name(), $sformatf("Comparing I2C transactions:\nExpected:\n%s\nActual:\n%s", exp_trans.sprint(), act_trans.sprint()), UVM_HIGH)
 
 		if (!exp_trans.compare(act_trans)) begin
 			`uvm_error(get_type_name(), $sformatf("I2C transaction mismatch:\nExpected:\n%s\nActual:\n%s", exp_trans.sprint(), act_trans.sprint()))
 			error = 1;
 		end else begin
+			`uvm_info(get_type_name(), {"I2C transaction matched",
+				act_trans.convert2string()}, UVM_MEDIUM)
 		end
-
-		// if (exp_trans.has_match)
-		// 	find_match(exp_trans);
 	endtask
 
 	function void report_phase(uvm_phase phase);
