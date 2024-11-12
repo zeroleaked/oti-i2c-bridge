@@ -119,10 +119,10 @@ class axil_ref_model extends uvm_component;
 	endtask
 	
 	task i2c_expected_transaction();
-		wait(master_req);
 		
 		i2c_trans.slave_addr = slave_addr;
-		
+		i2c_trans.is_write = is_write;
+
 		if (is_write) begin
 			i2c_trans.payload_data = {};
 			foreach(write_data_queue[i])

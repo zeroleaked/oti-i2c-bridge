@@ -130,6 +130,9 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 			`uvm_info(get_type_name(), "STOP condition detected", UVM_HIGH)
 			if (current_trans != null) begin
 				seq_item_port.item_done();
+				$cast(rsp,current_trans.clone());
+				rsp.set_id_info(req);
+				seq_item_port.put(rsp);
 				current_trans = null;
 			end
 			bit_count = 0;

@@ -78,12 +78,14 @@ class axil_monitor extends uvm_monitor;
             
             begin : read_collection
                 axil_seq_item read_tr;
-                @(vif.monitor_cb iff vif.monitor_cb.arvalid && vif.monitor_cb.arready);
+				`uvm_info(get_type_name(), "Waiting for read", UVM_HIGH);
+                wait(vif.monitor_cb.arvalid && vif.monitor_cb.arready);
                 read_tr = axil_seq_item::type_id::create("read_tr");
                 read_tr.addr = vif.monitor_cb.araddr;
                 read_tr.read = 1;
+				`uvm_info(get_type_name(), "Read address retrieved", UVM_HIGH);
                 
-                @(vif.monitor_cb iff vif.monitor_cb.rvalid && vif.monitor_cb.rready);
+                wait(vif.monitor_cb.rvalid && vif.monitor_cb.rready);
                 read_tr.data = vif.monitor_cb.rdata;
                 
                 `uvm_info(get_type_name(), {"Collected read transaction",

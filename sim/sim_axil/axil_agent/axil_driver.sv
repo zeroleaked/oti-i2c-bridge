@@ -45,8 +45,9 @@ class axil_driver extends uvm_driver #(axil_seq_item);
     endfunction
 
     task run_phase(uvm_phase phase);
-		// initialize
+		// initialize control outputs
         vif.driver_cb.bready <= 0;
+        vif.driver_cb.rready <= 0;
 
         forever begin
             seq_item_port.get_next_item(req);
