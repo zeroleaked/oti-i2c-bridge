@@ -73,32 +73,30 @@ class axil_ref_model extends uvm_component;
 
 	task run_phase(uvm_phase phase);
 		forever begin
-			fork begin fork
-				begin
-					wait(axil_queue.size() > 0);
-					axil_trans = axil_queue.pop_front();
-					`uvm_info(get_type_name(), {"Reference model receives axil",
-						axil_trans.convert2string()}, UVM_HIGH)
-					axil_expected_transaction();
-					axil_rm2sb_port.write(axil_trans);
-					`uvm_info(get_type_name(), {"Reference model sends",
-						axil_trans.convert2string()}, UVM_MEDIUM)
-					`uvm_info(get_type_name(), "AXIL ends fork", UVM_HIGH);
-				end
-				begin
-					wait(master_req && (i2c_queue.size() > 0));
-					i2c_trans = i2c_queue.pop_front();
-					`uvm_info(get_type_name(), {"Reference model receives i2c",
-						i2c_trans.convert2string()}, UVM_HIGH)
-					i2c_expected_transaction();
-					i2c_rm2sb_port.write(i2c_trans);
-					`uvm_info(get_type_name(), {"Reference model sends",
-						i2c_trans.convert2string()}, UVM_MEDIUM)
-					`uvm_info(get_type_name(), "I2C ends fork", UVM_HIGH);
-				end
-			join_any disable fork;
-			`uvm_info(get_type_name(), "End of fork", UVM_HIGH);
-			end join
+			wait ((axil_queue.size() > 0) || (master_req && (i2c_queue.size() > 0)))
+			
+			if (axil_queue.size() > 0) begin
+				axil_trans = axil_queue.pop_front();
+				`uvm_info(get_type_name(), {"Reference model receives axil",
+					axil_trans.convert2string()}, UVM_HIGH)
+				axil_expected_transaction();
+				axil_rm2sb_port.write(axil_trans);
+				`uvm_info(get_type_name(), {"Reference model sends",
+					axil_trans.convert2string()}, UVM_MEDIUM)
+				`uvm_info(get_type_name(), "AXIL ends fork", UVM_HIGH);
+			end
+
+			if (master_req && (i2c_queue.size() > 0)) begin
+				i2c_trans = i2c_queue.pop_front();
+				`uvm_info(get_type_name(), {"Reference model receives i2c",
+					i2c_trans.convert2string()}, UVM_HIGH)
+				i2c_expected_transaction();
+				i2c_rm2sb_port.write(i2c_trans);
+				`uvm_info(get_type_name(), {"Reference model sends",
+					i2c_trans.convert2string()}, UVM_MEDIUM)
+				`uvm_info(get_type_name(), "I2C ends fork", UVM_HIGH);
+			end
+
 		end
 	endtask
 
@@ -179,7 +177,7 @@ class axil_ref_model extends uvm_component;
 
 		end else begin
 		
-		// middle of i2c transaction
+		// middle of i2c read transaction
 		if ((flags & CMD_READ) && (slave_addr==axil_trans.data[6:0])) begin
 
 			`uvm_info(get_type_name(), "Continue reading", UVM_HIGH)
@@ -214,7 +212,6 @@ class axil_ref_model extends uvm_component;
 	task read_data();
 		bit [7:0] data_from_i2c;
 
-		// todo: take care of race condition
 		wait (read_data_queue.size() > 0) begin
 			data_from_i2c = read_data_queue.pop_front();
 			axil_trans.data = {22'h0, DATA_VALID, data_from_i2c};
