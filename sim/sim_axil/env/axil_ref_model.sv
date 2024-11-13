@@ -157,7 +157,7 @@ class axil_ref_model extends uvm_component;
 
 		// command to end i2c transaction
 		if (flags & CMD_STOP) begin
-			`uvm_info(get_type_name(), "Stop reading", UVM_HIGH)
+			`uvm_info(get_type_name(), "Stop bit detected", UVM_HIGH)
 			translator.add_stop_bit();
 		end
 		end
@@ -195,11 +195,17 @@ class axil_ref_model extends uvm_component;
 		end
 		else begin
 			`uvm_info(get_type_name(), "Valid read", UVM_HIGH)
+
+			// todo: handle empty read queue
+			assert(read_data_queue.size() > 0)
+			else `uvm_fatal(get_type_name(),
+				"Ref model has not implemented empty queue!")
+
 			data_from_i2c = read_data_queue.pop_front();
 			axil_trans.data = {22'h0, DATA_VALID, data_from_i2c};
 
 			// todo: scale with prescaler register
-			next_valid_read += 1000;
+			next_valid_read += 1010;
 		end
 	endtask
 
@@ -238,9 +244,9 @@ class axil_ref_model extends uvm_component;
 		// TODO: Scale with prescaler register
 		// the first read trans is longer than other reads, why?
 		if (has_read)
-			next_valid_read = axil_trans.start_time + 1960;
+			next_valid_read = axil_trans.start_time + 1930;
 		else begin
-			next_valid_read = axil_trans.start_time + 2040;
+			next_valid_read = axil_trans.start_time + 2006;
 			has_read = 1;
 		end
 	endtask
