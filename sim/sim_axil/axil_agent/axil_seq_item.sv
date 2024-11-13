@@ -70,7 +70,8 @@ class axil_seq_item extends uvm_sequence_item;
 			!this.data[8] && this.read && (this.addr==DATA_REG)
 		);
 
-		return ( compare(trans)  || is_invalid_read_data_reg );
+		if (is_invalid_read_data_reg) return 1;
+		else return compare(trans);
 	endfunction
 
 	virtual function string convert2string();
