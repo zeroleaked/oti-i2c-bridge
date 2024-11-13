@@ -23,14 +23,6 @@ class axil_i2c_translator extends uvm_component;
 	protected int read_data_length;
 	protected bit is_complete_transaction = 0;
 
-	bit is_write;
-	protected bit master_req = 0;
-	protected bit [7:0] read_data_queue[$];
-	protected bit [7:0] write_data_queue[$];
-	protected int read_length = 0;
-	protected bit [6:0] slave_addr;
-	protected bit is_write;
-
 	//----------------------------------------------------------------------------
 	// Main methods
 	//----------------------------------------------------------------------------
@@ -47,8 +39,9 @@ class axil_i2c_translator extends uvm_component;
 	endfunction
 
 	function void add_stop_bit();
-		assert(current_state==READ_PHASE || current_state==WRITE_PHASE)
-		else `uvm_fatal(get_type_name(), "Not in the state for add_stop_bit!")
+		assert(current_state inside {READ_PHASE, WRITE_PHASE, IDLE})
+		else `uvm_fatal(get_type_name(), {"state=",current_state.name(),
+			" Not in the state for add_stop_bit!"})
 
 		assert((read_data_length > 0) || (current_tr.payload_data.size > 0))
 		else `uvm_fatal(get_type_name(), "Transaction is empty!")
