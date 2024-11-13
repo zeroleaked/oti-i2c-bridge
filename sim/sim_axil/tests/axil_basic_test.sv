@@ -33,6 +33,8 @@ class axil_basic_test extends uvm_test;
         write_vseq.configure(
 			env.axil_seqr, env.i2c_agnt.sequencer);
 
+		env.scbd.set_report_verbosity_level(UVM_MEDIUM);
+
 		// single read & write
         repeat (multiplier_number) read_vseq.start_single();
         repeat (multiplier_number) write_vseq.start_single();
@@ -43,9 +45,7 @@ class axil_basic_test extends uvm_test;
 
 		// multiple back to back read & write
 		repeat (multiplier_number) begin
-			env.ref_model.set_report_verbosity_level(UVM_HIGH);
 			read_vseq.start_multiple();
-			env.ref_model.set_report_verbosity_level(UVM_LOW);
 			write_vseq.start_multiple();
 		end
         
