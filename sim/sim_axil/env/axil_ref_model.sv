@@ -57,6 +57,7 @@ class axil_ref_model extends uvm_component;
 		axil_imp = new("axil_imp", this);
 		i2c_imp = new("i2c_imp", this);
 		translator = new("translator", this);
+		translator.set_report_verbosity_level(UVM_HIGH);
 	endfunction
 
 	//----------------------------------------------------------------------------
@@ -157,7 +158,7 @@ class axil_ref_model extends uvm_component;
 
 		// command to end i2c transaction
 		if (flags & CMD_STOP) begin
-			`uvm_info(get_type_name(), "Stop reading", UVM_HIGH)
+			`uvm_info(get_type_name(), "Stop bit detected", UVM_HIGH)
 			translator.add_stop_bit();
 		end
 		end
@@ -195,6 +196,12 @@ class axil_ref_model extends uvm_component;
 		end
 		else begin
 			`uvm_info(get_type_name(), "Valid read", UVM_HIGH)
+
+			// todo: handle empty read queue
+			assert(read_data_queue.size() > 0)
+			else `uvm_fatal(get_type_name(),
+				"Ref model has not implemented empty queue!")
+
 			data_from_i2c = read_data_queue.pop_front();
 			axil_trans.data = {22'h0, DATA_VALID, data_from_i2c};
 

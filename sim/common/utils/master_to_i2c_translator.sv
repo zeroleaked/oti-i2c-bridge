@@ -38,7 +38,8 @@ class master_to_i2c_translator extends uvm_component;
         ADDR_PHASE,
         READ_PHASE,
         WRITE_PHASE,
-        STOP
+        STOP,
+		COMPLETE
     } build_state_t;
 
     //--------------------------------------------------------------------------
@@ -55,10 +56,6 @@ class master_to_i2c_translator extends uvm_component;
     // This is incremented by add_read_byte() calls
     protected int read_data_length;
     
-    // Flag indicating a transaction is ready to be retrieved
-    // Set when STOP command is received and transaction is fully formed
-    protected bit is_complete_transaction = 0;
-
     //--------------------------------------------------------------------------
     // I2C output methods
     //--------------------------------------------------------------------------
@@ -66,13 +63,13 @@ class master_to_i2c_translator extends uvm_component;
     // Returns true if a complete transaction is ready to be retrieved
     // Used by ref model to know when to process queued slave responses
     function bit is_ready();
-        return is_complete_transaction;
+        return current_state==COMPLETE;
     endfunction
 
     // Retrieves the completed transaction and merges in slave response data
     // for read transactions. The transaction is marked incomplete after retrieval.
     function i2c_transaction get_transaction(i2c_transaction slave_tr);
-        assert(is_complete_transaction)
+        assert(current_state==COMPLETE)
         else `uvm_fatal(get_type_name(),
             "Transaction is not complete!")
 
@@ -86,7 +83,7 @@ class master_to_i2c_translator extends uvm_component;
             end
         end
 
-        is_complete_transaction = 0;
+        current_state = IDLE;
         return current_tr;
     endfunction
 
@@ -117,8 +114,12 @@ class master_to_i2c_translator extends uvm_component;
         assert((read_data_length > 0) || (current_tr.payload_data.size > 0))
         else `uvm_fatal(get_type_name(), "Transaction is empty!")
 
-        current_state = IDLE;
-        is_complete_transaction = 1;
+		if (current_state inside {READ_PHASE, WRITE_PHASE})
+        	current_state = COMPLETE;
+
+		// covers stop command when nothing is going on
+		else
+			current_state = IDLE;
     endfunction
 
     //--------------------------------------------------------------------------
