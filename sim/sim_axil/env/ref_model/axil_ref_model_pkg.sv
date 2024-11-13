@@ -11,9 +11,10 @@ package axil_ref_model_pkg;
 	import i2c_master_axil_pkg::*;
 	import common_i2c_pkg::*;
 	import axil_agent_pkg::*;
+	import common_utils_pkg::*;
 
   // Include environment components
-  `include "axil_i2c_translator.sv"
+//   `include "axil_i2c_translator.sv"
   `include "axil_ref_model.sv"
 
 endpackage

@@ -1,8 +1,8 @@
 `ifndef AXIL_I2C_TRANSLATOR_SV
 `define AXIL_I2C_TRANSLATOR_SV
 
-class axil_i2c_translator extends uvm_component;
-	`uvm_component_utils(axil_i2c_translator)
+class master_to_i2c_translator extends uvm_component;
+	`uvm_component_utils(master_to_i2c_translator)
 
     // Internal state machine for building transaction
     typedef enum {
@@ -24,7 +24,34 @@ class axil_i2c_translator extends uvm_component;
 	protected bit is_complete_transaction = 0;
 
 	//----------------------------------------------------------------------------
-	// Main methods
+	// I2C output methods
+	//----------------------------------------------------------------------------
+
+	function bit is_ready();
+		return is_complete_transaction;
+	endfunction
+
+	function i2c_transaction get_transaction(i2c_transaction slave_tr);
+		assert(is_complete_transaction)
+		else `uvm_fatal(get_type_name(),
+			"Transaction is not complete!")
+
+		// copy slave's data for read transactions
+		if (!current_tr.is_write) begin
+			current_tr.payload_data = slave_tr.payload_data;
+
+			// Adjust payload_data length if it exceeds read_length
+			while (current_tr.payload_data.size() > read_data_length) begin
+				current_tr.payload_data.pop_back();
+			end
+		end
+
+		is_complete_transaction = 0;
+		return current_tr;
+	endfunction
+
+	//----------------------------------------------------------------------------
+	// Transaction control methods
 	//----------------------------------------------------------------------------
 
 	function void add_start_bit();
@@ -50,6 +77,10 @@ class axil_i2c_translator extends uvm_component;
 		is_complete_transaction = 1;
 	endfunction
 
+	//----------------------------------------------------------------------------
+	// Address phase methods
+	//----------------------------------------------------------------------------
+
 	function void add_slave_addr(bit [6:0] slave_addr);
 		assert(current_state==START)
 		else `uvm_fatal(get_type_name(),
@@ -60,11 +91,11 @@ class axil_i2c_translator extends uvm_component;
 		current_tr.slave_addr = slave_addr;
 	endfunction
 
-	function void set_direction(bit is_write);
+	function void add_direction(bit is_write);
 		assert(current_state==ADDR_PHASE)
 		else `uvm_fatal(get_type_name(),
 			{"state=",current_state.name(),
-			" set_direction was called before add_slave_addr!"})
+			" add_direction was called before add_slave_addr!"})
 
 		current_tr.is_write = is_write;
 
@@ -77,6 +108,10 @@ class axil_i2c_translator extends uvm_component;
 			read_data_length = 0;
 		end
 	endfunction
+
+	//----------------------------------------------------------------------------
+	// Data phase methods
+	//----------------------------------------------------------------------------
 
 	function void add_read_byte(bit [6:0] slave_addr);
 		assert(current_state==READ_PHASE)
@@ -98,30 +133,11 @@ class axil_i2c_translator extends uvm_component;
 		current_tr.payload_data.push_back(write_data);
 	endfunction
 
-	function bit is_ready();
-		return is_complete_transaction;
-	endfunction
+	//----------------------------------------------------------------------------
+	// Class methods
+	//----------------------------------------------------------------------------
 
-	function i2c_transaction get_transaction(i2c_transaction slave_tr);
-		assert(is_complete_transaction)
-		else `uvm_fatal(get_type_name(),
-			"Transaction is not complete!")
-
-		// copy slave's data for read transactions
-		if (!current_tr.is_write) begin
-			current_tr.payload_data = slave_tr.payload_data;
-
-			// Adjust payload_data length if it exceeds read_length
-			while (current_tr.payload_data.size() > read_data_length) begin
-				current_tr.payload_data.pop_back();
-			end
-		end
-
-		is_complete_transaction = 0;
-		return current_tr;
-	endfunction
-
-	function new(string name="axil_i2c_translator", uvm_component parent);
+	function new(string name="master_to_i2c_translator", uvm_component parent);
 		super.new(name, parent);
 	endfunction
 

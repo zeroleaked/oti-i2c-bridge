@@ -40,7 +40,7 @@ class axil_ref_model extends uvm_component;
 	protected bit has_read = 0;
 
 	// i2c transaction builder
-	axil_i2c_translator translator;
+	master_to_i2c_translator translator;
 
 	//----------------------------------------------------------------------------
 	// Methods
@@ -140,52 +140,18 @@ class axil_ref_model extends uvm_component;
 	task write_command();
 		bit [4:0] flags = axil_trans.data[12:8];
 
-		// start of i2c transaction
-		if (flags & CMD_START) begin
-			// save slave address, ensure all commands have this address
-			bit [6:0] slave_addr = axil_trans.data[6:0];
-			
-			`uvm_info(get_type_name(), "Start bit detected", UVM_HIGH)
-
-			translator.add_start_bit();
-			translator.add_slave_addr(slave_addr);
-			
-			// mark as a new i2c read transaction (1 byte)
-			if (flags & CMD_READ) begin
-				`uvm_info(get_type_name(), $sformatf("Starting a new read for %h",
-					slave_addr), UVM_HIGH)
-
-				translator.set_direction(0);
-				translator.add_read_byte(slave_addr);
-
-				// TODO: Scale with prescaler register
-				// the first read trans is longer than other reads, why?
-				if (has_read)
-					next_valid_read = axil_trans.start_time + 1960;
-				else begin
-					next_valid_read = axil_trans.start_time + 2040;
-					has_read = 1;
-				end
-			end
-
-			// mark as a new i2c multiple write transaction (0 bytes)
-			// TODO: implement single write
-			if (flags & CMD_WR_M) begin
-				`uvm_info(get_type_name(), $sformatf("Starting a new write for %h",
-					slave_addr), UVM_HIGH)
-				translator.set_direction(1);
-			end
-
-		end
+		// command to start i2c transaction
+		if (flags & CMD_START) 
+			handle_start_command(flags);
 		else begin
-		// read more bytes
-		if (flags & CMD_READ) begin
 
+		// command to read more bytes
+		if (flags & CMD_READ) begin
 			`uvm_info(get_type_name(), "Continue reading", UVM_HIGH)
 			translator.add_read_byte(axil_trans.data[6:0]);
 		end else
 
-		// end of i2c transaction
+		// command to end i2c transaction
 		if (flags & CMD_STOP) begin
 			`uvm_info(get_type_name(), "Stop reading", UVM_HIGH)
 			translator.add_stop_bit();
@@ -193,12 +159,12 @@ class axil_ref_model extends uvm_component;
 		end
 	endtask
 
+	// write to data register
 	task write_data();
 		bit [1:0] flags = axil_trans.data[9:8];
 
 		`uvm_info(get_type_name(), $sformatf("Add to write queue %h",
 			axil_trans.data[15:0]), UVM_HIGH)
-
 		translator.add_write_byte(axil_trans.data[7:0]);
 
 		// end of i2c write transaction
@@ -230,6 +196,48 @@ class axil_ref_model extends uvm_component;
 
 			// todo: scale with prescaler register
 			next_valid_read += 1000;
+		end
+	endtask
+
+	//----------------------------------------------------------------------------
+	// AXI-Lite Command Handlers
+	//----------------------------------------------------------------------------
+
+	task handle_start_command(bit [4:0] flags);
+		bit [6:0] slave_addr = axil_trans.data[6:0];
+		
+		`uvm_info(get_type_name(), "Start bit detected", UVM_HIGH)
+
+		translator.add_start_bit();
+		translator.add_slave_addr(slave_addr);
+		
+		// mark as a new i2c read transaction (1 byte)
+		if (flags & CMD_READ)
+			handle_start_read_command(slave_addr);
+
+		// mark as a new i2c multiple write transaction (0 bytes)
+		// TODO: implement single write command
+		if (flags & CMD_WR_M) begin
+			`uvm_info(get_type_name(), $sformatf("Starting a new write for %h",
+				slave_addr), UVM_HIGH)
+			translator.add_direction(1);
+		end
+	endtask
+
+	task handle_start_read_command(input bit [6:0] slave_addr);
+		`uvm_info(get_type_name(), $sformatf("Starting a new read for %h",
+			slave_addr), UVM_HIGH)
+
+		translator.add_direction(0);
+		translator.add_read_byte(slave_addr);
+
+		// TODO: Scale with prescaler register
+		// the first read trans is longer than other reads, why?
+		if (has_read)
+			next_valid_read = axil_trans.start_time + 1960;
+		else begin
+			next_valid_read = axil_trans.start_time + 2040;
+			has_read = 1;
 		end
 	endtask
 
