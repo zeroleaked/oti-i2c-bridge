@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // File: common_utils_pkg.sv
-// Description: Common Package for I2C UVM Verification
+// Description: Common Package for I2C Bridge UVM Verification
 //
 // This package contains rest of the common components for I2C protocol
 // verification that is master protocol agnostic.
@@ -24,10 +24,11 @@ package common_utils_pkg;
 
 // Import UVM base package - required for all UVM components
 import uvm_pkg::*;
-import common_i2c_pkg::i2c_transaction;
 
 // Include UVM macros for component automation
 `include "uvm_macros.svh"
+
+import common_i2c_pkg::i2c_transaction;
 
 //--------------------------------------------------------------------------
 // Component Hierarchy
