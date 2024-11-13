@@ -187,14 +187,14 @@ class axil_ref_model extends uvm_component;
 		bit [7:0] data_from_i2c;
 
 		`uvm_info(get_type_name(), $sformatf("start_time=%0d next_valid_read=%0d",
-			axil_trans.start_time, next_valid_read), UVM_LOW)
+			axil_trans.start_time, next_valid_read), UVM_HIGH)
 
 		if (next_valid_read > axil_trans.start_time) begin
-			`uvm_info(get_type_name(), "Invalid read", UVM_LOW)
+			`uvm_info(get_type_name(), "Invalid read", UVM_HIGH)
 			axil_trans.data = {22'h0, 2'b00, 8'h00};
 		end
 		else begin
-			`uvm_info(get_type_name(), "Valid read", UVM_LOW)
+			`uvm_info(get_type_name(), "Valid read", UVM_HIGH)
 			data_from_i2c = read_data_queue.pop_front();
 			axil_trans.data = {22'h0, DATA_VALID, data_from_i2c};
 
