@@ -206,7 +206,7 @@ class axil_ref_model extends uvm_component;
 			axil_trans.data = {22'h0, DATA_VALID, data_from_i2c};
 
 			// todo: scale with prescaler register
-			next_valid_read += 1000;
+			next_valid_read += 1010;
 		end
 	endtask
 
@@ -247,7 +247,7 @@ class axil_ref_model extends uvm_component;
 		if (has_read)
 			next_valid_read = axil_trans.start_time + 1960;
 		else begin
-			next_valid_read = axil_trans.start_time + 2040;
+			next_valid_read = axil_trans.start_time + 2006;
 			has_read = 1;
 		end
 	endtask
