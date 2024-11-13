@@ -59,6 +59,20 @@ class axil_seq_item extends uvm_sequence_item;
 		super.new(name);
 	endfunction
 
+	// exempt act_trans invalid read data reg for comparation
+	function bit compare_without_invalid_read( axil_seq_item trans );
+		bit is_invalid_read_data_reg;
+		
+		is_invalid_read_data_reg =
+			!trans.data[8] && trans.read && (trans.addr==DATA_REG);
+
+		is_invalid_read_data_reg = is_invalid_read_data_reg || (
+			!this.data[8] && this.read && (this.addr==DATA_REG)
+		);
+
+		return ( compare(trans)  || is_invalid_read_data_reg );
+	endfunction
+
 	virtual function string convert2string();
 		string s;
 		s = $sformatf("\n----------------------------------------");
