@@ -31,9 +31,6 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 	// Current transaction being processed
 	protected i2c_transaction current_trans;
 
-	// Port for reference model
-	uvm_analysis_port#(i2c_transaction) drv2rm_port;
-
 	// Buffer for driving read bytes
 	protected bit [7:0] byte_buffer;
 	
@@ -67,7 +64,6 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 		super.build_phase(phase);
 		if (!uvm_config_db#(virtual i2c_interface)::get(this, "", "i2c_vif", vif))
 			`uvm_fatal("NOVIF", {"Virtual interface must be set for: ", get_full_name(), ".vif"})
-		drv2rm_port = new("drv2rm_port", this);
 	endfunction
 
 	//--------------------------------------------------------------------------
@@ -109,14 +105,7 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 			`uvm_info(get_type_name(), "START condition detected", UVM_HIGH)
 			bit_count = 0;
 			if (current_trans == null) begin
-				i2c_transaction to_rm;
-
 				seq_item_port.get_next_item(current_trans);
-
-				$cast(to_rm,current_trans.clone());
-				to_rm.set_id_info(current_trans);
-				drv2rm_port.write(to_rm);
-
 				is_ongoing = 1;
 			end
 		end
@@ -130,11 +119,7 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 			`uvm_info(get_type_name(), "STOP condition detected", UVM_HIGH)
 			if (current_trans != null) begin
 				seq_item_port.item_done();
-				$cast(rsp,current_trans.clone());
-				rsp.set_id_info(current_trans);
-				seq_item_port.put(rsp);
 				current_trans = null;
-				`uvm_info(get_type_name(), "Response sent", UVM_HIGH)
 			end
 			bit_count = 0;
 			vif.sda_o <= 1;  // Release SDA line
@@ -217,13 +202,9 @@ class i2c_driver extends uvm_driver #(i2c_transaction);
 		
 		if (is_ongoing) begin
 			// Load new byte if starting a new byte transmission
-			if (bit_index == 7) begin
+			if (bit_index == 7)
 				byte_buffer = current_trans.payload_data.pop_front();
-				`uvm_info(get_type_name(), 
-						$sformatf("byte_buffer=%h", byte_buffer), 
-						UVM_HIGH)
-			end
-
+				
 			vif.sda_o <= byte_buffer[bit_index];
 			wait(vif.scl_i);
 			

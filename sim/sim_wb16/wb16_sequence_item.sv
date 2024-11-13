@@ -15,7 +15,7 @@ class sequence_item_base extends uvm_sequence_item;
     endfunction
 
     // item member
-    rand logic   [7:0]              data;
+    rand logic   [15:0]              data;
     rand logic                      rw; // r:0, w:1
 
 endclass
