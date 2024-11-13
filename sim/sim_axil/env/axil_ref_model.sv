@@ -37,7 +37,6 @@ class axil_ref_model extends uvm_component;
 
 	// properties for the timing model
 	protected time next_valid_read;
-	protected bit has_read = 0;
 
 	// i2c transaction builder
 	protected master_to_i2c_translator translator;
@@ -242,13 +241,7 @@ class axil_ref_model extends uvm_component;
 		translator.add_read_byte(slave_addr);
 
 		// TODO: Scale with prescaler register
-		// the first read trans is longer than other reads, why?
-		if (has_read)
-			next_valid_read = axil_trans.start_time + 1930;
-		else begin
-			next_valid_read = axil_trans.start_time + 2006;
-			has_read = 1;
-		end
+		next_valid_read = axil_trans.start_time + 1930;
 	endtask
 
 endclass

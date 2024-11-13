@@ -58,12 +58,12 @@ class axil_driver extends uvm_driver #(axil_seq_item);
 			// receive from sequencer
             seq_item_port.get_next_item(req);
 
+            drive_transaction();
+
 			// send out to reference model
 			$cast(to_rm,req.clone());
 			to_rm.start_time = $time;
 			drv2rm_port.write(to_rm);
-
-            drive_transaction();
 
 			// return to sequencer
 			$cast(rsp,req.clone());
