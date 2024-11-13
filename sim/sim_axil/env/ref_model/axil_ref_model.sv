@@ -22,11 +22,11 @@ class axil_ref_model extends uvm_component;
 	// Input Queues
 	//----------------------------------------------------------------------------
 	
-	axil_seq_item axil_queue[$];
-	i2c_transaction i2c_queue[$];
+	protected axil_seq_item axil_queue[$];
+	protected i2c_transaction i2c_queue[$];
 
-	axil_seq_item axil_trans;
-	i2c_transaction i2c_trans;
+	protected axil_seq_item axil_trans;
+	protected i2c_transaction i2c_trans;
 
 	//----------------------------------------------------------------------------
 	// Class Properties
@@ -40,7 +40,7 @@ class axil_ref_model extends uvm_component;
 	protected bit has_read = 0;
 
 	// i2c transaction builder
-	master_to_i2c_translator translator;
+	protected master_to_i2c_translator translator;
 
 	//----------------------------------------------------------------------------
 	// Methods
@@ -84,7 +84,9 @@ class axil_ref_model extends uvm_component;
 				axil_trans = axil_queue.pop_front();
 				`uvm_info(get_type_name(), {"Reference model receives axil",
 					axil_trans.convert2string()}, UVM_HIGH)
+				
 				axil_expected_transaction();
+				
 				axil_rm2sb_port.write(axil_trans);
 				`uvm_info(get_type_name(), {"Reference model sends",
 					axil_trans.convert2string()}, UVM_MEDIUM)
@@ -94,10 +96,12 @@ class axil_ref_model extends uvm_component;
 				i2c_trans = i2c_queue.pop_front();
 				`uvm_info(get_type_name(), {"Reference model receives i2c",
 					i2c_trans.convert2string()}, UVM_HIGH)
+
 				i2c_expected_transaction();
+				
 				i2c_rm2sb_port.write(i2c_trans);
-				// `uvm_info(get_type_name(), {"Reference model sends",
-				// 	i2c_trans.convert2string()}, UVM_MEDIUM)
+				`uvm_info(get_type_name(), {"Reference model sends",
+					i2c_trans.convert2string()}, UVM_MEDIUM)
 			end
 
 		end
