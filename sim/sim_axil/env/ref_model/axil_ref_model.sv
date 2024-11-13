@@ -36,11 +36,11 @@ class axil_ref_model extends uvm_component;
 	protected bit [7:0] read_data_queue[$];
 	protected bit [7:0] write_data_queue[$];
 	protected int read_length = 0;
-	protected time read_starts;
 	protected time next_valid_read;
 	protected bit has_read = 0;
-	protected bit [6:0] slave_addr;
 	protected bit is_write;
+
+	axil_i2c_translator translator;
 
 	//----------------------------------------------------------------------------
 	// Methods
@@ -56,6 +56,7 @@ class axil_ref_model extends uvm_component;
 		super.build_phase(phase);
 		axil_imp = new("axil_imp", this);
 		i2c_imp = new("i2c_imp", this);
+		translator = new("translator", this);
 	endfunction
 
 	//----------------------------------------------------------------------------
@@ -86,10 +87,10 @@ class axil_ref_model extends uvm_component;
 				axil_rm2sb_port.write(axil_trans);
 				`uvm_info(get_type_name(), {"Reference model sends",
 					axil_trans.convert2string()}, UVM_MEDIUM)
-				`uvm_info(get_type_name(), "AXIL ends fork", UVM_HIGH);
 			end
 
-			if (master_req && (i2c_queue.size() > 0)) begin
+			if (translator.is_ready() && (i2c_queue.size() > 0)) begin
+			// if (master_req && (i2c_queue.size() > 0)) begin
 				`uvm_info(get_type_name(), $sformatf("master_req=%b", master_req), UVM_HIGH)
 				i2c_trans = i2c_queue.pop_front();
 				`uvm_info(get_type_name(), {"Reference model receives i2c",
@@ -98,7 +99,6 @@ class axil_ref_model extends uvm_component;
 				i2c_rm2sb_port.write(i2c_trans);
 				// `uvm_info(get_type_name(), {"Reference model sends",
 				// 	i2c_trans.convert2string()}, UVM_MEDIUM)
-				`uvm_info(get_type_name(), "I2C ends fork", UVM_HIGH);
 			end
 
 		end
@@ -123,24 +123,11 @@ class axil_ref_model extends uvm_component;
 	endtask
 	
 	task i2c_expected_transaction();
-		
-		i2c_trans.slave_addr = slave_addr;
-		i2c_trans.is_write = is_write;
+		i2c_trans = translator.get_transaction(i2c_trans);
 
-		if (is_write) begin
-			`uvm_info(get_type_name(), "Processing i2c write", UVM_HIGH)
-			i2c_trans.payload_data = write_data_queue;
-			write_data_queue = {};
-		end
+		// i2c_trans.is_write = is_write;
 
-		else begin // read
-			// Adjust payload_data length if it exceeds read_length
-			while (i2c_trans.payload_data.size() > read_length) begin
-				i2c_trans.payload_data.pop_back();
-			end
-			`uvm_info(get_type_name(), $sformatf("Length adjusted to %0d",
-				read_length), UVM_HIGH)
-
+		if (!i2c_trans.is_write) begin
 			// Copy payload to internal queue
 			foreach(i2c_trans.payload_data[i]) begin
 				read_data_queue.push_back(i2c_trans.payload_data[i]);
@@ -159,18 +146,25 @@ class axil_ref_model extends uvm_component;
 
 		// start of i2c transaction
 		if (flags & CMD_START) begin
+			// save slave address, ensure all commands have this address
+			bit [6:0] slave_addr = axil_trans.data[6:0];
+			
 			`uvm_info(get_type_name(), "Start bit detected", UVM_HIGH)
 
-			// save slave address, ensure all commands have this address
-			slave_addr = axil_trans.data[6:0];
+			translator.add_start_bit();
+			translator.add_slave_addr(slave_addr);
 			
 			// mark as a new i2c read transaction (1 byte)
 			if (flags & CMD_READ) begin
 				`uvm_info(get_type_name(), $sformatf("Starting a new read for %h",
 					slave_addr), UVM_HIGH)
+
+				translator.set_direction(0);
+				translator.add_read_byte(slave_addr);
+
 				read_length = 1;
 				is_write = 0;
-				read_starts = axil_trans.start_time;
+
 				// TODO: Scale with prescaler register
 				// the first read trans is longer than other reads, why?
 				if (has_read)
@@ -182,7 +176,10 @@ class axil_ref_model extends uvm_component;
 			end
 
 			// mark as a new i2c multiple write transaction (0 bytes)
+			// TODO: implement single write
 			if (flags & CMD_WR_M) begin
+				translator.set_direction(1);
+
 				`uvm_info(get_type_name(), $sformatf("Starting a new write for %h",
 					slave_addr), UVM_HIGH)
 				is_write = 1;
@@ -192,9 +189,10 @@ class axil_ref_model extends uvm_component;
 		else if (!is_write) begin
 		
 		// middle of i2c read transaction
-		if ((flags & CMD_READ) && (slave_addr==axil_trans.data[6:0])) begin
+		if (flags & CMD_READ) begin
 
 			`uvm_info(get_type_name(), "Continue reading", UVM_HIGH)
+			translator.add_read_byte(axil_trans.data[6:0]);
 
 			// read more bytes
 			read_length++;
@@ -204,6 +202,8 @@ class axil_ref_model extends uvm_component;
 		// end of i2c read transaction
 		if (flags & CMD_STOP) begin
 			`uvm_info(get_type_name(), "Stop reading", UVM_HIGH)
+			translator.add_stop_bit();
+
 			master_req = 1;
 		end
 		end
@@ -215,9 +215,13 @@ class axil_ref_model extends uvm_component;
 		write_data_queue.push_back(axil_trans.data[7:0]);
 		`uvm_info(get_type_name(), $sformatf("Add to write queue %h", axil_trans.data[15:0]), UVM_HIGH)
 
+		translator.add_write_byte(axil_trans.data[7:0]);
+
 		// end of i2c write transaction
 		if (flags & DATA_LAST) begin
 			`uvm_info(get_type_name(), "Data is last", UVM_HIGH)
+			translator.add_stop_bit();
+
 			master_req = 1;
 		end
 		`uvm_info(get_type_name(), $sformatf("master_req=%b", master_req), UVM_HIGH)
@@ -235,9 +239,11 @@ class axil_ref_model extends uvm_component;
 			axil_trans.start_time, next_valid_read), UVM_LOW)
 
 		if (next_valid_read > axil_trans.start_time) begin
+			`uvm_info(get_type_name(), "Invalid read", UVM_LOW)
 			axil_trans.data = {22'h0, 2'b00, 8'h00};
 		end
 		else begin
+			`uvm_info(get_type_name(), "Valid read", UVM_LOW)
 			data_from_i2c = read_data_queue.pop_front();
 			axil_trans.data = {22'h0, DATA_VALID, data_from_i2c};
 
