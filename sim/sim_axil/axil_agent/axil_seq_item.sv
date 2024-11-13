@@ -59,7 +59,7 @@ class axil_seq_item extends uvm_sequence_item;
 		super.new(name);
 	endfunction
 
-	// if both read data is invalid exempt from comparation
+	// if both read data is invalid, exempt from comparison
 	function bit compare_without_invalid_read( axil_seq_item trans );
 		bit is_invalid_read_data_reg;
 		
