@@ -190,7 +190,7 @@ class axil_ref_model extends uvm_component;
 
 		if (next_valid_read > axil_trans.start_time) begin
 			`uvm_info(get_type_name(), "Invalid read", UVM_HIGH)
-			axil_trans.data = {22'h0, 2'b00, 8'h00};
+			axil_trans.data = {22'h0, DATA_DEFAULT, 8'h00};
 		end
 		else begin
 			`uvm_info(get_type_name(), "Valid read", UVM_HIGH)
@@ -201,7 +201,7 @@ class axil_ref_model extends uvm_component;
 				"Ref model has not implemented empty queue!")
 
 			data_from_i2c = read_data_queue.pop_front();
-			axil_trans.data = {22'h0, DATA_VALID, data_from_i2c};
+			axil_trans.data = {16'h0, DATA_VALID, data_from_i2c};
 
 			// todo: scale with prescaler register
 			next_valid_read += 1010;

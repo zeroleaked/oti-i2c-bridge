@@ -52,10 +52,10 @@ typedef enum bit [4:0] {
 } reg_cmd_flag_t;
 
 // Data register flags
-typedef enum bit [1:0] {
-	DATA_LAST		= 2'h2,   // Last byte flag
-	DATA_VALID		= 2'h1, // Data valid flag
-	DATA_DEFAULT	= 2'h0  // Default state
+typedef enum bit [7:0] {
+	DATA_LAST		= 8'h02,   // Last byte flag
+	DATA_VALID		= 8'h01, // Data valid flag
+	DATA_DEFAULT	= 8'h00  // Default state
 } reg_data_flag_t;
 
 `endif

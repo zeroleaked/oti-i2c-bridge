@@ -66,7 +66,7 @@ class axil_bus_seq extends uvm_sequence #(axil_seq_item);
 				start(sequencer);
 				#100;
 			join
-		end while ((rsp.data[9:8] & DATA_VALID) == 2'b00);
+		end while (!(rsp.data[15:8] & DATA_VALID));
 		`uvm_info(get_type_name(), $sformatf("Read data register response %s", rsp.convert2string()), UVM_HIGH)
 	endtask
 
