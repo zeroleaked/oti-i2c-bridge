@@ -52,23 +52,26 @@ package axil_seq_list;
 	//--------------------------------------------------------------------------
 
 	// write to i2c
-	`include "axil_i2c_wr_seq.sv"
+	`include "workers/axil_i2c_wr_seq.sv"
 	
 	// base read to i2c
-	`include "axil_i2c_rd_base_seq.sv" 
+	`include "workers/axil_i2c_rd_base_seq.sv" 
 	
 	// read to i2c basic
-	`include "axil_i2c_rd_seq.sv"
+	`include "workers/axil_i2c_rd_seq.sv"
 
 	// read to i2c with invalid reads
-	`include "axil_i2c_rd_invalid_seq.sv"
+	`include "workers/axil_i2c_rd_invalid_seq.sv"
 
 	//--------------------------------------------------------------------------
 	// Virtual Sequences
 	//--------------------------------------------------------------------------
 
 	// Basic functionality
-	`include "axil_basic_vseq.sv"
+	`include "vseq/axil_basic_vseq.sv"
+
+	// Invalid reads
+	`include "vseq/axil_rd_invalid_vseq.sv"
 
 endpackage
 

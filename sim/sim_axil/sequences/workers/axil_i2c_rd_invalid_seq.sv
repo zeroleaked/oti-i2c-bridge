@@ -7,8 +7,8 @@ class axil_i2c_rd_invalid_seq extends axil_i2c_rd_base_seq;
 	task body();
 		super.body();
 
-		// read rest of the data
-		repeat (payload_data_length-1) begin
+		// try to read all the data
+		repeat (payload_data_length) begin
 			api.read_data_until_valid();
 		end
 	endtask

@@ -7,6 +7,10 @@ class axil_i2c_rd_seq extends axil_i2c_rd_base_seq;
 	task body();
 		super.body();
 
+		// read first data
+		#2000
+		api.read_data_until_valid();
+
 		// read rest of the data
 		repeat (payload_data_length-1) begin
 			#1000
