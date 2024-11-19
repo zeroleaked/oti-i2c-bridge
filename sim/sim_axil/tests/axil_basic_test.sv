@@ -22,10 +22,12 @@ class axil_basic_test extends uvm_test;
 		read_write_sequences();
 		read_invalid_sequences();
         
-        // TODO: Add more sophisticated test scenarios
         #1000;
         phase.drop_objection(this);
     endtask
+
+	// when these subtasks gets too many, make them sequences
+	// for now, I don't see a pattern for a base vseq, but perhaps later
 
 	task read_write_sequences();
 		int multiplier_number = 50;
