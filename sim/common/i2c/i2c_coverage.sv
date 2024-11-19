@@ -38,7 +38,6 @@ class i2c_coverage extends uvm_subscriber #(i2c_transaction);
 
   covergroup payload_data_cg;
     payload_size_cp: coverpoint trans.payload_data.size() {
-      // bins empty = {0};
       bins low = {[1:8]};
       bins mid = {[9:16]};
       bins high = {[17:24]};
@@ -85,11 +84,6 @@ class i2c_coverage extends uvm_subscriber #(i2c_transaction);
                                         binsof(direction_cp) intersect {1};
     }
   endgroup
-
-  // slave_address_cg sa_cg;
-  // payload_data_cg pd_cg;
-  // transaction_direction_cg td_cg;
-  // combined_cg c_cg;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
