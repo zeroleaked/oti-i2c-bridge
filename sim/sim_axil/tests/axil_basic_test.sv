@@ -16,10 +16,15 @@ class axil_basic_test extends uvm_test;
     endfunction
 
     task run_phase(uvm_phase phase);
+		axil_basic_vseq basic_vseq;
         
         phase.raise_objection(this);
 
-		read_write_sequences();
+		basic_vseq = axil_basic_vseq::type_id::create("basic_vseq", this);
+		basic_vseq.configure(env.axil_seqr, env.i2c_agnt.sequencer);
+		basic_vseq.start(null);
+
+		// read_write_sequences();
 		read_invalid_sequences();
         
         #1000;
