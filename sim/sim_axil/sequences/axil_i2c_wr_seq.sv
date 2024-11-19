@@ -1,8 +1,8 @@
-`ifndef AXIL_I2C_OP_WRITE_SEQ
-`define AXIL_I2C_OP_WRITE_SEQ
+`ifndef AXIL_I2C_WR_SEQ
+`define AXIL_I2C_WR_SEQ
 
-class axil_i2c_op_write_seq extends master_i2c_op_base_seq;
-    `uvm_object_utils(axil_i2c_op_write_seq)
+class axil_i2c_wr_seq extends master_i2c_op_base_seq;
+    `uvm_object_utils(axil_i2c_wr_seq)
 	
 	task body();
 		axil_bus_seq api;
@@ -20,7 +20,7 @@ class axil_i2c_op_write_seq extends master_i2c_op_base_seq;
 		api.write_command(slave_addr, CMD_STOP);
 	endtask
 
-    function new(string name = "axil_i2c_op_write_seq");
+    function new(string name = "axil_i2c_wr_seq");
         super.new(name);
     endfunction
 

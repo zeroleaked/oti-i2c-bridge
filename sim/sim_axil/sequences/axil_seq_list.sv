@@ -46,9 +46,21 @@ package axil_seq_list;
 	// APIs
 	`include "axil_bus_seq.sv"
 
+	//--------------------------------------------------------------------------
 	// AXI-Lite workers
-	`include "axil_i2c_op_write_seq.sv" // write to i2c
-	`include "axil_i2c_op_read_seq.sv" // read to i2c
+	//--------------------------------------------------------------------------
+
+	// write to i2c
+	`include "axil_i2c_wr_seq.sv"
+	
+	// base read to i2c
+	`include "axil_i2c_rd_base_seq.sv" 
+	
+	// read to i2c basic
+	`include "axil_i2c_rd_seq.sv"
+
+	// read to i2c with invalid reads
+	`include "axil_i2c_rd_invalid_seq.sv"
 
 endpackage
 
