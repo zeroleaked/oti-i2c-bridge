@@ -43,15 +43,20 @@ class i2c_coverage extends uvm_subscriber #(i2c_transaction);
       bins high = {[17:24]};
       bins extra_high = {[25:32]};
     }
-
-    payload_value_cp: coverpoint trans.payload_data[$] {
-      bins zeros = {8'h00};
-      bins ones = {8'hFF};
-      bins alternating = {8'b10101010, 8'b01010101};
-      bins low = {[8'h01:8'h7F]};
-      bins high = {[8'h80:8'hFE]};
-    }
   endgroup
+
+	// Byte-level coverage
+	covergroup byte_cg with function sample(bit[7:0] data);
+		option.per_instance = 1;
+		
+		value_cp: coverpoint data {
+			bins zeros = {8'h00};
+			bins ones = {8'hFF};
+			bins alternating = {8'b10101010, 8'b01010101};
+			bins low = {[8'h01:8'h7F]};
+			bins high = {[8'h80:8'hFE]};
+		}
+	endgroup
 
   covergroup transaction_direction_cg;
     direction_cp: coverpoint trans.is_write {
@@ -91,14 +96,19 @@ class i2c_coverage extends uvm_subscriber #(i2c_transaction);
     payload_data_cg = new();
     transaction_direction_cg = new();
     combined_cg = new();
+		byte_cg = new();
   endfunction
 
   function void write(i2c_transaction t);
     trans = t;
     slave_address_cg.sample();
-    payload_data_cg.sample();
     transaction_direction_cg.sample();
     combined_cg.sample();
+		payload_data_cg.sample();
+
+		// Sample each byte in the payload
+		foreach (trans.payload_data[i])
+			byte_cg.sample(trans.payload_data[i]);
   endfunction
 endclass
 `endif
