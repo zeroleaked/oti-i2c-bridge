@@ -62,10 +62,7 @@ class axil_bus_seq extends uvm_sequence #(axil_seq_item);
 		is_write = 0;
 		req.cfg_address = DATA_REG;
 		do begin
-			fork
-				start(sequencer);
-				#100;
-			join
+			start(sequencer);
 		end while (!(rsp.data[15:8] & DATA_VALID));
 		`uvm_info(get_type_name(), $sformatf("Read data register response %s", rsp.convert2string()), UVM_HIGH)
 	endtask
