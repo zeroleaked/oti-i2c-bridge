@@ -16,17 +16,30 @@ class axil_basic_test extends uvm_test;
     endfunction
 
     task run_phase(uvm_phase phase);
-		int multiplier_number = 50;
-
-        basic_rd_wr_vseq#(axil_i2c_op_read_seq) read_vseq;
-        basic_rd_wr_vseq#(axil_i2c_op_write_seq) write_vseq;
-
-		read_vseq = basic_rd_wr_vseq#(axil_i2c_op_read_seq)::
-			type_id::create("read_vseq", this);
-		write_vseq = basic_rd_wr_vseq#(axil_i2c_op_write_seq)::
-			type_id::create("write_vseq", this);
         
         phase.raise_objection(this);
+
+		read_write_sequences();
+		read_invalid_sequences();
+        
+        // TODO: Add more sophisticated test scenarios
+        #1000;
+        phase.drop_objection(this);
+    endtask
+
+	task read_write_sequences();
+		int multiplier_number = 50;
+        basic_rd_wr_vseq#(axil_i2c_rd_seq) read_vseq;
+        basic_rd_wr_vseq#(axil_i2c_wr_seq) write_vseq;
+
+        `uvm_info(get_type_name(),
+			$sformatf("Basic Functionality starts %0d I2C transactions",
+			multiplier_number*6), UVM_LOW);
+
+		read_vseq = basic_rd_wr_vseq#(axil_i2c_rd_seq)::
+			type_id::create("read_vseq", this);
+		write_vseq = basic_rd_wr_vseq#(axil_i2c_wr_seq)::
+			type_id::create("write_vseq", this);
 
         read_vseq.configure(
 			env.axil_seqr, env.i2c_agnt.sequencer);
@@ -46,12 +59,33 @@ class axil_basic_test extends uvm_test;
 			read_vseq.start_multiple();
 			write_vseq.start_multiple();
 		end
-        
-        // TODO: Add more sophisticated test scenarios
-        #1000;
-        phase.drop_objection(this);
-    endtask
-    // TODO: Implement other phases as needed (e.g., extract_phase for results checking)
+
+        `uvm_info(get_type_name(), "Basic Functionality ends", UVM_LOW);
+	endtask
+
+	task read_invalid_sequences();
+		int multiplier_number = 1;
+        basic_rd_wr_vseq#(axil_i2c_rd_invalid_seq) read_vseq;
+
+        `uvm_info(get_type_name(),
+			$sformatf("Invalid Read starts %0d I2C transactions",
+			multiplier_number*2), UVM_LOW);
+
+		read_vseq = basic_rd_wr_vseq#(axil_i2c_rd_invalid_seq)::
+			type_id::create("read_vseq", this);
+
+        read_vseq.configure(
+			env.axil_seqr, env.i2c_agnt.sequencer);
+
+		// single read
+        repeat (multiplier_number) read_vseq.start_single();
+
+		// multiple read
+        repeat (multiplier_number) read_vseq.start_multiple();
+
+        `uvm_info(get_type_name(), "Invalid Read ends", UVM_LOW);
+	endtask
+
 endclass
 
 `endif
