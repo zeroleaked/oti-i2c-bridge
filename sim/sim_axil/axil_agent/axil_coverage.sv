@@ -34,17 +34,41 @@ class axil_coverage extends uvm_subscriber #(axil_seq_item);
         addr_dir_cross: cross addr_cp, direction_cp;
         // TODO: Add cross coverage with data values for write transactions
     endgroup
+
+	// Data Transfer Coverage
+	covergroup data_transfer_cg;
+		option.per_instance = 1;
+
+		// Data values
+		data_cp: coverpoint trans.data[7:0] {
+			bins low_values = {[8'h00:8'h1F]};
+			bins mid_values = {[8'h20:8'hDF]};
+			bins high_values = {[8'hE0:8'hFF]};
+		}
+
+		// Data valid for read op
+		data_valid_cp: coverpoint trans.data[8] iff (trans.read == 1);
+
+		// Data last for write op
+		data_last_cp: coverpoint trans.data[9] iff (trans.read == 0);
+	endgroup
     
     axil_seq_item trans;
     
     function new(string name, uvm_component parent);
         super.new(name, parent);
         axil_cg = new();
+		data_transfer_cg = new();
     endfunction
     
     function void write(axil_seq_item t);
         trans = t;
         axil_cg.sample();
+
+		// Only sample data transfer coverage for DATA_REG transactions
+		if (trans.addr == DATA_REG) begin
+			data_transfer_cg.sample();
+		end
     endfunction
     // TODO: Implement report_phase to provide coverage summary
 endclass

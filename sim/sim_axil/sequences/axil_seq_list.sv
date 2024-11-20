@@ -29,26 +29,49 @@
 
 package axil_seq_list;
    
-   import uvm_pkg::*;
-   `include "uvm_macros.svh"
+	import uvm_pkg::*;
+	`include "uvm_macros.svh"
 
-   //////////////////////////////////////////////////////////
-   // importing packages : agent,ref model, register ...
-   /////////////////////////////////////////////////////////
+	//--------------------------------------------------------------------------
+	// importing packages : agent,ref model, register ...
+	//--------------------------------------------------------------------------
 	import i2c_master_axil_pkg::*;
 	import axil_bridge_env_pkg::*;
 	import axil_agent_pkg::axil_seq_item;
 	import common_i2c_pkg::i2c_transaction;
 	import common_seq_lib::*;
-   //////////////////////////////////////////////////////////
-   // include top env files 
-   /////////////////////////////////////////////////////////
-	// APIs
+
+	//--------------------------------------------------------------------------
+	// AXI-Lite APIs
+	//--------------------------------------------------------------------------
+
 	`include "axil_bus_seq.sv"
 
+	//--------------------------------------------------------------------------
 	// AXI-Lite workers
-	`include "axil_i2c_op_write_seq.sv" // write to i2c
-	`include "axil_i2c_op_read_seq.sv" // read to i2c
+	//--------------------------------------------------------------------------
+
+	// write to i2c
+	`include "workers/axil_i2c_wr_seq.sv"
+	
+	// base read to i2c
+	`include "workers/axil_i2c_rd_base_seq.sv" 
+	
+	// read to i2c basic
+	`include "workers/axil_i2c_rd_seq.sv"
+
+	// read to i2c with invalid reads
+	`include "workers/axil_i2c_rd_invalid_seq.sv"
+
+	//--------------------------------------------------------------------------
+	// Virtual Sequences
+	//--------------------------------------------------------------------------
+
+	// Basic functionality
+	`include "vseq/axil_basic_vseq.sv"
+
+	// Invalid reads
+	`include "vseq/axil_rd_invalid_vseq.sv"
 
 endpackage
 

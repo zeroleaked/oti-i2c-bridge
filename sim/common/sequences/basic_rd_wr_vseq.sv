@@ -55,14 +55,10 @@ class basic_rd_wr_vseq #(type T=master_i2c_op_base_seq) extends uvm_sequence;
     //--------------------------------------------------------------------------
     // Factory Registration
     //--------------------------------------------------------------------------
-    `uvm_object_utils_begin(basic_rd_wr_vseq#(T))
+    `uvm_object_param_utils_begin(basic_rd_wr_vseq#(T))
         `uvm_field_int(slave_addr, UVM_DEFAULT)
         `uvm_field_int(payload_data_length, UVM_DEFAULT)
     `uvm_object_utils_end
-
-    //--------------------------------------------------------------------------
-    // Class Properties
-    //--------------------------------------------------------------------------
 
     //--------------------------------------------------------------------------
     // Constructor
@@ -118,7 +114,7 @@ class basic_rd_wr_vseq #(type T=master_i2c_op_base_seq) extends uvm_sequence;
     protected task randomize_this();
         if (!this.randomize())
             `uvm_error(get_type_name(), "Randomization failed");
-        `uvm_info(get_type_name(), $sformatf("slave_addr=%0h payload_data_length=%0d", slave_addr, payload_data_length), UVM_LOW)
+        `uvm_info(get_type_name(), $sformatf("slave_addr=%0h payload_data_length=%0d", slave_addr, payload_data_length), UVM_MEDIUM)
 
         // apply randomized to each workers
         i2c_api.req.cfg_slave_addr = slave_addr;
